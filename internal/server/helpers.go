@@ -10,7 +10,7 @@ import (
 	"github.com/monke/grimoire/internal/content"
 )
 
-// entrySummary is a lightweight representation of an entry for list responses.
+// entrySummary is a lightweight representation of an entry for search results.
 type entrySummary struct {
 	Name        string   `json:"name"`
 	Type        string   `json:"type"`
@@ -41,21 +41,6 @@ func (s *Server) entrySummaryResult(entries []*content.Entry) *mcp.CallToolResul
 	return &mcp.CallToolResult{
 		Content: []mcp.Content{
 			&mcp.TextContent{Text: string(data)},
-		},
-	}
-}
-
-func (s *Server) getEntryResult(typ content.Type, name string) *mcp.CallToolResult {
-	entry, err := s.store.Get(typ, name)
-	if err != nil {
-		slog.Warn("failed to get entry", "type", typ, "name", name, "error", err)
-
-		return errorResult(err)
-	}
-
-	return &mcp.CallToolResult{
-		Content: []mcp.Content{
-			&mcp.TextContent{Text: entry.Body},
 		},
 	}
 }

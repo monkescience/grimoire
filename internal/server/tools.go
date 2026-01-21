@@ -5,131 +5,18 @@ import (
 	"log/slog"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-
-	"github.com/monke/grimoire/internal/content"
 )
 
-// Tool input types.
-
-type emptyInput struct{}
-
-type nameInput struct {
-	Name string `json:"name" jsonschema:"Name of the entry"`
-}
-
+// searchInput is the input for the search tool.
 type searchInput struct {
 	Query string `json:"query" jsonschema:"Search query"`
 }
 
-func (s *Server) registerTools() {
-	mcp.AddTool(s.mcp, &mcp.Tool{
-		Name:        "list_rules",
-		Description: "List all available coding rules",
-	}, s.handleListRules)
-
-	mcp.AddTool(s.mcp, &mcp.Tool{
-		Name:        "list_prompts",
-		Description: "List all available prompts",
-	}, s.handleListPrompts)
-
-	mcp.AddTool(s.mcp, &mcp.Tool{
-		Name:        "list_skills",
-		Description: "List all available skills",
-	}, s.handleListSkills)
-
-	mcp.AddTool(s.mcp, &mcp.Tool{
-		Name:        "get_rule",
-		Description: "Get a specific coding rule by name",
-	}, s.handleGetRule)
-
-	mcp.AddTool(s.mcp, &mcp.Tool{
-		Name:        "get_prompt",
-		Description: "Get a specific prompt by name",
-	}, s.handleGetPrompt)
-
-	mcp.AddTool(s.mcp, &mcp.Tool{
-		Name:        "get_skill",
-		Description: "Get a specific skill by name",
-	}, s.handleGetSkill)
-
+func (s *Server) registerSearch() {
 	mcp.AddTool(s.mcp, &mcp.Tool{
 		Name:        "search",
-		Description: "Search across all rules, prompts, and skills",
+		Description: "Search for guidance by keyword. Returns matching skills, rules, and prompts.",
 	}, s.handleSearch)
-}
-
-// Tool handlers.
-
-func (s *Server) handleListRules(
-	_ context.Context,
-	_ *mcp.CallToolRequest,
-	_ emptyInput,
-) (*mcp.CallToolResult, any, error) {
-	slog.Debug("listing rules")
-
-	entries := s.store.List(content.TypeRule)
-
-	slog.Debug("rules listed", "count", len(entries))
-
-	return s.entrySummaryResult(entries), nil, nil
-}
-
-func (s *Server) handleListPrompts(
-	_ context.Context,
-	_ *mcp.CallToolRequest,
-	_ emptyInput,
-) (*mcp.CallToolResult, any, error) {
-	slog.Debug("listing prompts")
-
-	entries := s.store.List(content.TypePrompt)
-
-	slog.Debug("prompts listed", "count", len(entries))
-
-	return s.entrySummaryResult(entries), nil, nil
-}
-
-func (s *Server) handleListSkills(
-	_ context.Context,
-	_ *mcp.CallToolRequest,
-	_ emptyInput,
-) (*mcp.CallToolResult, any, error) {
-	slog.Debug("listing skills")
-
-	entries := s.store.List(content.TypeSkill)
-
-	slog.Debug("skills listed", "count", len(entries))
-
-	return s.entrySummaryResult(entries), nil, nil
-}
-
-func (s *Server) handleGetRule(
-	_ context.Context,
-	_ *mcp.CallToolRequest,
-	input nameInput,
-) (*mcp.CallToolResult, any, error) {
-	slog.Debug("getting rule", "name", input.Name)
-
-	return s.getEntryResult(content.TypeRule, input.Name), nil, nil
-}
-
-func (s *Server) handleGetPrompt(
-	_ context.Context,
-	_ *mcp.CallToolRequest,
-	input nameInput,
-) (*mcp.CallToolResult, any, error) {
-	slog.Debug("getting prompt", "name", input.Name)
-
-	return s.getEntryResult(content.TypePrompt, input.Name), nil, nil
-}
-
-func (s *Server) handleGetSkill(
-	_ context.Context,
-	_ *mcp.CallToolRequest,
-	input nameInput,
-) (*mcp.CallToolResult, any, error) {
-	slog.Debug("getting skill", "name", input.Name)
-
-	return s.getEntryResult(content.TypeSkill, input.Name), nil, nil
 }
 
 func (s *Server) handleSearch(

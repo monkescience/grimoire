@@ -26,14 +26,14 @@ func New(version string, s *store.Store) *Server {
 				Version: version,
 			},
 			&mcp.ServerOptions{
-				Instructions: "Grimoire is a knowledge server providing coding rules, prompts, and skills.",
+				Instructions: buildServerInstructions(s),
 			},
 		),
 	}
 
-	srv.registerTools()
+	srv.registerGuidance()
+	srv.registerSearch()
 	srv.registerResources()
-	srv.registerPrompts()
 
 	slog.Debug("server initialized")
 
