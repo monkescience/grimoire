@@ -1,4 +1,5 @@
 ---
+type: skill
 name: debug
 title: Debugging
 description: Systematic approach to finding and fixing bugs

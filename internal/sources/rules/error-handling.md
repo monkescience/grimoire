@@ -1,4 +1,5 @@
 ---
+type: rule
 name: error-handling
 title: Error Handling
 description: Best practices for handling errors in code

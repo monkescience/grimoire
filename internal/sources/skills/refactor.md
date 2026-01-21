@@ -1,4 +1,5 @@
 ---
+type: skill
 name: refactor
 title: Code Refactoring
 description: Skill for refactoring code while preserving behavior

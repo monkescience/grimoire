@@ -24,7 +24,6 @@ func main() {
 }
 
 func run() error {
-	contentDir := flag.String("content", "", "Path to content directory (overrides embedded content)")
 	showVersion := flag.Bool("version", false, "Show version")
 
 	flag.Parse()
@@ -35,18 +34,10 @@ func run() error {
 		return nil
 	}
 
-	// Create store based on configuration
-	var s store.Store
-
-	embedStore := store.NewEmbedStore(sources.FS, "")
-
-	if *contentDir != "" {
-		// Use file store with embedded fallback
-		fileStore := store.NewFileStore(*contentDir)
-		s = store.NewMultiStore(fileStore, embedStore)
-	} else {
-		// Use embedded content only
-		s = embedStore
+	// Create store from embedded sources
+	s, err := store.New(sources.FS)
+	if err != nil {
+		return fmt.Errorf("loading sources: %w", err)
 	}
 
 	// Create and run server
@@ -64,7 +55,7 @@ func run() error {
 		cancel()
 	}()
 
-	err := srv.Run(ctx)
+	err = srv.Run(ctx)
 	if err != nil {
 		return fmt.Errorf("server: %w", err)
 	}

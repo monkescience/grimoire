@@ -1,4 +1,5 @@
 ---
+type: prompt
 name: code-review
 title: Code Review
 description: Prompt for performing thorough code reviews

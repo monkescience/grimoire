@@ -14,8 +14,9 @@ import (
 const frontmatterDelimiter = "---"
 
 // parseMarkdown parses a markdown file with YAML frontmatter.
-func parseMarkdown(data []byte, typ content.Type) (*content.Entry, error) {
-	entry := &content.Entry{Type: typ}
+// The type is determined from the frontmatter "type" field.
+func parseMarkdown(data []byte) (*content.Entry, error) {
+	entry := &content.Entry{}
 
 	// Check for frontmatter delimiter
 	if !bytes.HasPrefix(data, []byte(frontmatterDelimiter)) {

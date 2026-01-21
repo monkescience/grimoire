@@ -19,11 +19,11 @@ var ErrNameRequired = errors.New("name is required")
 // Server wraps the MCP server with grimoire functionality.
 type Server struct {
 	mcp   *mcp.Server
-	store store.Store
+	store *store.Store
 }
 
 // New creates a new grimoire MCP server.
-func New(version string, s store.Store) *Server {
+func New(version string, s *store.Store) *Server {
 	srv := &Server{
 		store: s,
 		mcp: mcp.NewServer(
@@ -167,10 +167,7 @@ func (s *Server) handleListRules(
 	_ *mcp.CallToolRequest,
 	_ emptyInput,
 ) (*mcp.CallToolResult, any, error) {
-	entries, err := s.store.List(content.TypeRule)
-	if err != nil {
-		return errorResult(err), nil, nil
-	}
+	entries := s.store.List(content.TypeRule)
 
 	return s.entrySummaryResult(entries), nil, nil
 }
@@ -180,10 +177,7 @@ func (s *Server) handleListPrompts(
 	_ *mcp.CallToolRequest,
 	_ emptyInput,
 ) (*mcp.CallToolResult, any, error) {
-	entries, err := s.store.List(content.TypePrompt)
-	if err != nil {
-		return errorResult(err), nil, nil
-	}
+	entries := s.store.List(content.TypePrompt)
 
 	return s.entrySummaryResult(entries), nil, nil
 }
@@ -193,10 +187,7 @@ func (s *Server) handleListSkills(
 	_ *mcp.CallToolRequest,
 	_ emptyInput,
 ) (*mcp.CallToolResult, any, error) {
-	entries, err := s.store.List(content.TypeSkill)
-	if err != nil {
-		return errorResult(err), nil, nil
-	}
+	entries := s.store.List(content.TypeSkill)
 
 	return s.entrySummaryResult(entries), nil, nil
 }
@@ -230,10 +221,7 @@ func (s *Server) handleSearch(
 	_ *mcp.CallToolRequest,
 	input searchInput,
 ) (*mcp.CallToolResult, any, error) {
-	entries, err := s.store.Search(input.Query)
-	if err != nil {
-		return errorResult(err), nil, nil
-	}
+	entries := s.store.Search(input.Query)
 
 	return s.entrySummaryResult(entries), nil, nil
 }
