@@ -1,7 +1,6 @@
 ---
 type: rule
 name: naming
-title: Naming Conventions
 description: Guidelines for naming variables, functions, and types
 tags: [naming, readability, style]
 ---

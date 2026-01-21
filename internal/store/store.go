@@ -21,9 +21,8 @@ type Store struct {
 func New(fsys fs.FS) (*Store, error) {
 	s := &Store{
 		entries: map[content.Type]map[string]*content.Entry{
-			content.TypeRule:   {},
-			content.TypePrompt: {},
-			content.TypeSkill:  {},
+			content.TypeRule:  {},
+			content.TypeSkill: {},
 		},
 	}
 
@@ -134,10 +133,6 @@ func (s *Store) Search(query string) []*content.Entry {
 // matches checks if an entry matches the search query.
 func matches(entry *content.Entry, query string) bool {
 	if strings.Contains(strings.ToLower(entry.Name), query) {
-		return true
-	}
-
-	if strings.Contains(strings.ToLower(entry.Title), query) {
 		return true
 	}
 

@@ -14,7 +14,6 @@ import (
 type entrySummary struct {
 	Name        string   `json:"name"`
 	Type        string   `json:"type"`
-	Title       string   `json:"title,omitempty"`
 	Description string   `json:"description,omitempty"`
 	Tags        []string `json:"tags,omitempty"`
 }
@@ -25,7 +24,6 @@ func (s *Server) entrySummaryResult(entries []*content.Entry) *mcp.CallToolResul
 		summaries[i] = entrySummary{
 			Name:        e.Name,
 			Type:        string(e.Type),
-			Title:       e.Title,
 			Description: e.Description,
 			Tags:        e.Tags,
 		}

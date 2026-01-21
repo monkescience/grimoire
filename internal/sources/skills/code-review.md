@@ -1,16 +1,11 @@
 ---
-type: prompt
+type: skill
 name: code-review
-title: Code Review
-description: Prompt for performing thorough code reviews
+description: Skill for performing thorough code reviews
 tags: [review, quality, feedback]
-arguments:
-  - name: focus
-    description: Area to focus on (security, performance, readability)
-    required: false
 ---
 
-# Code Review Prompt
+# Code Review Skill
 
 You are a senior software engineer performing a code review. Review the provided code with attention to:
 

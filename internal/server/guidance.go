@@ -17,6 +17,15 @@ type guidanceInput struct {
 	Name string `json:"name" jsonschema:"Name of the guidance to load"`
 }
 
+// formatTags formats tags for display in the description.
+func formatTags(tags []string) string {
+	if len(tags) == 0 {
+		return ""
+	}
+
+	return " [" + strings.Join(tags, ", ") + "]"
+}
+
 // buildGuidanceDescription generates the guidance tool description from store content.
 // This allows the AI to see all available guidance upfront.
 func buildGuidanceDescription(s *store.Store) string {
@@ -30,7 +39,7 @@ func buildGuidanceDescription(s *store.Store) string {
 		b.WriteString("\nSKILLS (task instructions):\n")
 
 		for _, e := range skills {
-			fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
+			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, formatTags(e.Tags), e.Description)
 		}
 	}
 
@@ -40,17 +49,7 @@ func buildGuidanceDescription(s *store.Store) string {
 		b.WriteString("\nRULES (conventions to follow):\n")
 
 		for _, e := range rules {
-			fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
-		}
-	}
-
-	// Prompts section
-	prompts := s.List(content.TypePrompt)
-	if len(prompts) > 0 {
-		b.WriteString("\nPROMPTS (templates):\n")
-
-		for _, e := range prompts {
-			fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
+			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, formatTags(e.Tags), e.Description)
 		}
 	}
 
@@ -103,7 +102,7 @@ func (s *Server) handleGuidance(
 	slog.Debug("loading guidance", "name", input.Name)
 
 	// Try each type until we find a match
-	for _, typ := range []content.Type{content.TypeSkill, content.TypeRule, content.TypePrompt} {
+	for _, typ := range []content.Type{content.TypeSkill, content.TypeRule} {
 		entry, err := s.store.Get(typ, input.Name)
 		if err == nil {
 			slog.Debug("guidance loaded", "name", input.Name, "type", typ)

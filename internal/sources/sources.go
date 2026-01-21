@@ -3,7 +3,7 @@ package sources
 
 import "embed"
 
-// FS contains the embedded source files (rules, prompts, skills).
+// FS contains the embedded source files (rules and skills).
 //
-//go:embed rules prompts skills
+//go:embed rules skills
 var FS embed.FS

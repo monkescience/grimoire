@@ -1,7 +1,6 @@
 ---
 type: rule
 name: error-handling
-title: Error Handling
 description: Best practices for handling errors in code
 tags: [errors, best-practices, reliability]
 ---
