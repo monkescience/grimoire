@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"embed"
 	"flag"
 	"fmt"
 	"log"
@@ -11,11 +10,9 @@ import (
 	"syscall"
 
 	"github.com/monke/grimoire/internal/server"
+	"github.com/monke/grimoire/internal/sources"
 	"github.com/monke/grimoire/internal/store"
 )
-
-//go:embed content
-var embeddedContent embed.FS
 
 var version = "dev"
 
@@ -41,7 +38,7 @@ func run() error {
 	// Create store based on configuration
 	var s store.Store
 
-	embedStore := store.NewEmbedStore(embeddedContent, "content")
+	embedStore := store.NewEmbedStore(sources.FS, "")
 
 	if *contentDir != "" {
 		// Use file store with embedded fallback
