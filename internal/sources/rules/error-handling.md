@@ -23,7 +23,8 @@ tags: [errors, best-practices, reliability]
 ### Go
 ```go
 // Add context when wrapping
-if err := doSomething(); err != nil {
+err := doSomething()
+if err != nil {
     return fmt.Errorf("failed to do something: %w", err)
 }
 ```
