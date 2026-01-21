@@ -1,0 +1,11 @@
+# Binary
+/grimoire
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Vendor (if used)
+/vendor/
