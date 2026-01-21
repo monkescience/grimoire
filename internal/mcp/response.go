@@ -1,4 +1,4 @@
-package server
+package mcp
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/monke/grimoire/internal/content"
+	"github.com/monke/grimoire/internal/grimoire"
 )
 
 // entrySummary is a lightweight representation of an entry for search results.
@@ -18,7 +18,7 @@ type entrySummary struct {
 	Tags        []string `json:"tags,omitempty"`
 }
 
-func (s *Server) entrySummaryResult(entries []*content.Entry) *mcp.CallToolResult {
+func (s *Server) entrySummaryResult(entries []*grimoire.Entry) *mcp.CallToolResult {
 	summaries := make([]entrySummary, len(entries))
 	for i, e := range entries {
 		summaries[i] = entrySummary{
@@ -44,7 +44,7 @@ func (s *Server) entrySummaryResult(entries []*content.Entry) *mcp.CallToolResul
 }
 
 func (s *Server) getResourceContents(
-	typ content.Type,
+	typ grimoire.Type,
 	name, uri string,
 ) (*mcp.ReadResourceResult, error) {
 	entry, err := s.store.Get(typ, name)

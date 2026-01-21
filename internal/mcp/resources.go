@@ -1,4 +1,4 @@
-package server
+package mcp
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/monke/grimoire/internal/content"
+	"github.com/monke/grimoire/internal/grimoire"
 )
 
 func (s *Server) registerResources() {
@@ -42,7 +42,7 @@ func (s *Server) handleRuleResource(
 
 	slog.Debug("reading rule resource", "name", name, "uri", req.Params.URI)
 
-	return s.getResourceContents(content.TypeRule, name, req.Params.URI)
+	return s.getResourceContents(grimoire.TypeRule, name, req.Params.URI)
 }
 
 func (s *Server) handleSkillResource(
@@ -53,5 +53,5 @@ func (s *Server) handleSkillResource(
 
 	slog.Debug("reading skill resource", "name", name, "uri", req.Params.URI)
 
-	return s.getResourceContents(content.TypeSkill, name, req.Params.URI)
+	return s.getResourceContents(grimoire.TypeSkill, name, req.Params.URI)
 }

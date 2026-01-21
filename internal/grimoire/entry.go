@@ -1,4 +1,6 @@
-package content
+package grimoire
+
+import "strings"
 
 // Type represents the kind of content.
 type Type string
@@ -34,4 +36,13 @@ type Entry struct {
 
 	// Body is the main content (markdown).
 	Body string `yaml:"-"`
+}
+
+// FormatTags formats tags for display in descriptions.
+func (e *Entry) FormatTags() string {
+	if len(e.Tags) == 0 {
+		return ""
+	}
+
+	return " [" + strings.Join(e.Tags, ", ") + "]"
 }

@@ -9,9 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/monke/grimoire/internal/server"
+	"github.com/monke/grimoire/internal/grimoire"
+	"github.com/monke/grimoire/internal/mcp"
 	"github.com/monke/grimoire/internal/sources"
-	"github.com/monke/grimoire/internal/store"
 )
 
 var version = "dev"
@@ -42,7 +42,7 @@ func run() error {
 	slog.Info("starting grimoire", "version", version)
 
 	// Create store from embedded sources
-	s, err := store.New(sources.FS)
+	s, err := grimoire.New(sources.FS)
 	if err != nil {
 		return fmt.Errorf("loading sources: %w", err)
 	}
@@ -50,7 +50,7 @@ func run() error {
 	slog.Debug("store initialized")
 
 	// Create and run server
-	srv := server.New(version, s)
+	srv := mcp.New(version, s)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

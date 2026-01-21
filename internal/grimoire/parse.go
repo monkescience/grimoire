@@ -1,4 +1,4 @@
-package store
+package grimoire
 
 import (
 	"bytes"
@@ -6,8 +6,6 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v3"
-
-	"github.com/monke/grimoire/internal/content"
 )
 
 // frontmatterDelimiter separates YAML frontmatter from markdown body.
@@ -15,8 +13,8 @@ const frontmatterDelimiter = "---"
 
 // parseMarkdown parses a markdown file with YAML frontmatter.
 // The type is determined from the frontmatter "type" field.
-func parseMarkdown(data []byte) (*content.Entry, error) {
-	entry := &content.Entry{}
+func parseMarkdown(data []byte) (*Entry, error) {
+	entry := &Entry{}
 
 	// Check for frontmatter delimiter
 	if !bytes.HasPrefix(data, []byte(frontmatterDelimiter)) {

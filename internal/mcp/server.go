@@ -1,4 +1,4 @@
-package server
+package mcp
 
 import (
 	"context"
@@ -7,17 +7,17 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
-	"github.com/monke/grimoire/internal/store"
+	"github.com/monke/grimoire/internal/grimoire"
 )
 
 // Server wraps the MCP server with grimoire functionality.
 type Server struct {
 	mcp   *mcp.Server
-	store *store.Store
+	store *grimoire.Store
 }
 
 // New creates a new grimoire MCP server.
-func New(version string, s *store.Store) *Server {
+func New(version string, s *grimoire.Store) *Server {
 	srv := &Server{
 		store: s,
 		mcp: mcp.NewServer(
@@ -26,7 +26,7 @@ func New(version string, s *store.Store) *Server {
 				Version: version,
 			},
 			&mcp.ServerOptions{
-				Instructions: buildServerInstructions(s),
+				Instructions: grimoire.BuildServerInstructions(s),
 			},
 		),
 	}

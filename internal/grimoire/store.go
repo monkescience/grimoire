@@ -1,5 +1,4 @@
-// Package store provides content storage for grimoire.
-package store
+package grimoire
 
 import (
 	"cmp"
@@ -7,22 +6,20 @@ import (
 	"io/fs"
 	"slices"
 	"strings"
-
-	"github.com/monke/grimoire/internal/content"
 )
 
 // Store provides access to grimoire content.
 type Store struct {
-	entries map[content.Type]map[string]*content.Entry
+	entries map[Type]map[string]*Entry
 }
 
 // New creates a store by loading all markdown files from the given filesystem.
 // Files are scanned recursively and the type is determined from frontmatter.
 func New(fsys fs.FS) (*Store, error) {
 	s := &Store{
-		entries: map[content.Type]map[string]*content.Entry{
-			content.TypeRule:  {},
-			content.TypeSkill: {},
+		entries: map[Type]map[string]*Entry{
+			TypeRule:  {},
+			TypeSkill: {},
 		},
 	}
 
@@ -61,7 +58,7 @@ func New(fsys fs.FS) (*Store, error) {
 		}
 
 		if _, exists := s.entries[entry.Type]; !exists {
-			s.entries[entry.Type] = make(map[string]*content.Entry)
+			s.entries[entry.Type] = make(map[string]*Entry)
 		}
 
 		s.entries[entry.Type][entry.Name] = entry
@@ -76,7 +73,7 @@ func New(fsys fs.FS) (*Store, error) {
 }
 
 // Get retrieves a single entry by type and name.
-func (s *Store) Get(typ content.Type, name string) (*content.Entry, error) {
+func (s *Store) Get(typ Type, name string) (*Entry, error) {
 	if name == "" {
 		return nil, fmt.Errorf("%s: %w", typ, ErrNameEmpty)
 	}
@@ -91,18 +88,18 @@ func (s *Store) Get(typ content.Type, name string) (*content.Entry, error) {
 }
 
 // List returns all entries of a given type, sorted by name.
-func (s *Store) List(typ content.Type) []*content.Entry {
+func (s *Store) List(typ Type) []*Entry {
 	entries, ok := s.entries[typ]
 	if !ok {
 		return nil
 	}
 
-	result := make([]*content.Entry, 0, len(entries))
+	result := make([]*Entry, 0, len(entries))
 	for _, entry := range entries {
 		result = append(result, entry)
 	}
 
-	slices.SortFunc(result, func(a, b *content.Entry) int {
+	slices.SortFunc(result, func(a, b *Entry) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
 
@@ -110,10 +107,10 @@ func (s *Store) List(typ content.Type) []*content.Entry {
 }
 
 // Search finds entries matching the query across all types, sorted by name.
-func (s *Store) Search(query string) []*content.Entry {
+func (s *Store) Search(query string) []*Entry {
 	query = strings.ToLower(query)
 
-	var results []*content.Entry
+	var results []*Entry
 
 	for _, entries := range s.entries {
 		for _, entry := range entries {
@@ -123,7 +120,7 @@ func (s *Store) Search(query string) []*content.Entry {
 		}
 	}
 
-	slices.SortFunc(results, func(a, b *content.Entry) int {
+	slices.SortFunc(results, func(a, b *Entry) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
 
@@ -131,7 +128,7 @@ func (s *Store) Search(query string) []*content.Entry {
 }
 
 // matches checks if an entry matches the search query.
-func matches(entry *content.Entry, query string) bool {
+func matches(entry *Entry, query string) bool {
 	if strings.Contains(strings.ToLower(entry.Name), query) {
 		return true
 	}
