@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -19,12 +19,14 @@ var version = "dev"
 func main() {
 	err := run()
 	if err != nil {
-		log.Fatal(err)
+		slog.Error("fatal error", "error", err)
+		os.Exit(1)
 	}
 }
 
 func run() error {
 	showVersion := flag.Bool("version", false, "Show version")
+	verbose := flag.Bool("verbose", false, "Enable verbose logging (debug level)")
 
 	flag.Parse()
 
@@ -34,11 +36,18 @@ func run() error {
 		return nil
 	}
 
+	// Configure logger based on verbose flag
+	configureLogger(*verbose)
+
+	slog.Info("starting grimoire", "version", version)
+
 	// Create store from embedded sources
 	s, err := store.New(sources.FS)
 	if err != nil {
 		return fmt.Errorf("loading sources: %w", err)
 	}
+
+	slog.Debug("store initialized")
 
 	// Create and run server
 	srv := server.New(version, s)
@@ -61,4 +70,18 @@ func run() error {
 	}
 
 	return nil
+}
+
+func configureLogger(verbose bool) {
+	level := slog.LevelInfo
+	if verbose {
+		level = slog.LevelDebug
+	}
+
+	// Write logs to stderr to keep stdout clean for MCP protocol
+	handler := slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
+		Level: level,
+	})
+
+	slog.SetDefault(slog.New(handler))
 }

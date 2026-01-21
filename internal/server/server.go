@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -41,15 +42,26 @@ func New(version string, s *store.Store) *Server {
 	srv.registerResources()
 	srv.registerPrompts()
 
+	slog.Debug("server initialized",
+		"tools", 7,
+		"resources", 3,
+		"prompts", 2,
+	)
+
 	return srv
 }
 
 // Run starts the server on stdio.
 func (s *Server) Run(ctx context.Context) error {
+	slog.Info("starting MCP server on stdio")
+
 	err := s.mcp.Run(ctx, &mcp.StdioTransport{})
 	if err != nil {
+		slog.Error("server stopped with error", "error", err)
 		return fmt.Errorf("mcp server: %w", err)
 	}
+
+	slog.Info("server stopped")
 
 	return nil
 }
@@ -167,7 +179,11 @@ func (s *Server) handleListRules(
 	_ *mcp.CallToolRequest,
 	_ emptyInput,
 ) (*mcp.CallToolResult, any, error) {
+	slog.Debug("listing rules")
+
 	entries := s.store.List(content.TypeRule)
+
+	slog.Debug("rules listed", "count", len(entries))
 
 	return s.entrySummaryResult(entries), nil, nil
 }
@@ -177,7 +193,11 @@ func (s *Server) handleListPrompts(
 	_ *mcp.CallToolRequest,
 	_ emptyInput,
 ) (*mcp.CallToolResult, any, error) {
+	slog.Debug("listing prompts")
+
 	entries := s.store.List(content.TypePrompt)
+
+	slog.Debug("prompts listed", "count", len(entries))
 
 	return s.entrySummaryResult(entries), nil, nil
 }
@@ -187,7 +207,11 @@ func (s *Server) handleListSkills(
 	_ *mcp.CallToolRequest,
 	_ emptyInput,
 ) (*mcp.CallToolResult, any, error) {
+	slog.Debug("listing skills")
+
 	entries := s.store.List(content.TypeSkill)
+
+	slog.Debug("skills listed", "count", len(entries))
 
 	return s.entrySummaryResult(entries), nil, nil
 }
@@ -197,6 +221,8 @@ func (s *Server) handleGetRule(
 	_ *mcp.CallToolRequest,
 	input nameInput,
 ) (*mcp.CallToolResult, any, error) {
+	slog.Debug("getting rule", "name", input.Name)
+
 	return s.getEntryResult(content.TypeRule, input.Name), nil, nil
 }
 
@@ -205,6 +231,8 @@ func (s *Server) handleGetPrompt(
 	_ *mcp.CallToolRequest,
 	input nameInput,
 ) (*mcp.CallToolResult, any, error) {
+	slog.Debug("getting prompt", "name", input.Name)
+
 	return s.getEntryResult(content.TypePrompt, input.Name), nil, nil
 }
 
@@ -213,6 +241,8 @@ func (s *Server) handleGetSkill(
 	_ *mcp.CallToolRequest,
 	input nameInput,
 ) (*mcp.CallToolResult, any, error) {
+	slog.Debug("getting skill", "name", input.Name)
+
 	return s.getEntryResult(content.TypeSkill, input.Name), nil, nil
 }
 
@@ -221,7 +251,11 @@ func (s *Server) handleSearch(
 	_ *mcp.CallToolRequest,
 	input searchInput,
 ) (*mcp.CallToolResult, any, error) {
+	slog.Debug("searching", "query", input.Query)
+
 	entries := s.store.Search(input.Query)
+
+	slog.Debug("search completed", "query", input.Query, "results", len(entries))
 
 	return s.entrySummaryResult(entries), nil, nil
 }
@@ -234,6 +268,8 @@ func (s *Server) handleRuleResource(
 ) (*mcp.ReadResourceResult, error) {
 	name := strings.TrimPrefix(req.Params.URI, "grimoire://rules/")
 
+	slog.Debug("reading rule resource", "name", name, "uri", req.Params.URI)
+
 	return s.getResourceContents(content.TypeRule, name, req.Params.URI)
 }
 
@@ -243,6 +279,8 @@ func (s *Server) handlePromptResource(
 ) (*mcp.ReadResourceResult, error) {
 	name := strings.TrimPrefix(req.Params.URI, "grimoire://prompts/")
 
+	slog.Debug("reading prompt resource", "name", name, "uri", req.Params.URI)
+
 	return s.getResourceContents(content.TypePrompt, name, req.Params.URI)
 }
 
@@ -251,6 +289,8 @@ func (s *Server) handleSkillResource(
 	req *mcp.ReadResourceRequest,
 ) (*mcp.ReadResourceResult, error) {
 	name := strings.TrimPrefix(req.Params.URI, "grimoire://skills/")
+
+	slog.Debug("reading skill resource", "name", name, "uri", req.Params.URI)
 
 	return s.getResourceContents(content.TypeSkill, name, req.Params.URI)
 }
@@ -263,11 +303,15 @@ func (s *Server) handleApplyRulePrompt(
 ) (*mcp.GetPromptResult, error) {
 	name := req.Params.Arguments["name"]
 	if name == "" {
+		slog.Warn("apply_rule prompt called without name")
 		return nil, ErrNameRequired
 	}
 
+	slog.Debug("applying rule prompt", "name", name)
+
 	entry, err := s.store.Get(content.TypeRule, name)
 	if err != nil {
+		slog.Error("failed to get rule for prompt", "name", name, "error", err)
 		return nil, fmt.Errorf("get rule %q: %w", name, err)
 	}
 
@@ -290,11 +334,15 @@ func (s *Server) handleUseSkillPrompt(
 ) (*mcp.GetPromptResult, error) {
 	name := req.Params.Arguments["name"]
 	if name == "" {
+		slog.Warn("use_skill prompt called without name")
 		return nil, ErrNameRequired
 	}
 
+	slog.Debug("using skill prompt", "name", name)
+
 	entry, err := s.store.Get(content.TypeSkill, name)
 	if err != nil {
+		slog.Error("failed to get skill for prompt", "name", name, "error", err)
 		return nil, fmt.Errorf("get skill %q: %w", name, err)
 	}
 
@@ -340,6 +388,7 @@ func (s *Server) entrySummaryResult(entries []*content.Entry) *mcp.CallToolResul
 
 	data, err := json.MarshalIndent(summaries, "", "  ")
 	if err != nil {
+		slog.Error("failed to marshal entry summaries", "error", err)
 		return errorResult(err)
 	}
 
@@ -353,6 +402,7 @@ func (s *Server) entrySummaryResult(entries []*content.Entry) *mcp.CallToolResul
 func (s *Server) getEntryResult(typ content.Type, name string) *mcp.CallToolResult {
 	entry, err := s.store.Get(typ, name)
 	if err != nil {
+		slog.Warn("failed to get entry", "type", typ, "name", name, "error", err)
 		return errorResult(err)
 	}
 
@@ -369,6 +419,7 @@ func (s *Server) getResourceContents(
 ) (*mcp.ReadResourceResult, error) {
 	entry, err := s.store.Get(typ, name)
 	if err != nil {
+		slog.Warn("failed to get resource contents", "type", typ, "name", name, "error", err)
 		return nil, fmt.Errorf("get %s %q: %w", typ, name, err)
 	}
 
