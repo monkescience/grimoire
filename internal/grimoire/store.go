@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"fmt"
 	"io/fs"
+	"os"
 	"slices"
 	"strings"
 )
@@ -13,9 +14,11 @@ type Store struct {
 	entries map[Type]map[string]*Entry
 }
 
-// New creates a store by loading all markdown files from the given filesystem.
-// Files are scanned recursively and the type is determined from frontmatter.
-func New(fsys fs.FS) (*Store, error) {
+// New creates a store by loading content according to the provided config.
+// If builtinFS is provided and config enables builtin, embedded content is loaded.
+// External paths from config are also loaded.
+// Returns an error if duplicate entries are found or if a source path doesn't exist.
+func New(cfg *Config, builtinFS fs.FS) (*Store, error) {
 	s := &Store{
 		entries: map[Type]map[string]*Entry{
 			TypeRule:  {},
@@ -23,48 +26,33 @@ func New(fsys fs.FS) (*Store, error) {
 		},
 	}
 
-	err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+	// Load external paths first (higher priority for error messages)
+	for _, path := range cfg.Sources.Paths {
+		info, err := os.Stat(path)
 		if err != nil {
-			return err
+			if os.IsNotExist(err) {
+				return nil, fmt.Errorf("source %q: %w", path, ErrSourceNotFound)
+			}
+
+			return nil, fmt.Errorf("source %q: %w", path, err)
 		}
 
-		if d.IsDir() || !strings.HasSuffix(path, ".md") {
-			return nil
+		if !info.IsDir() {
+			return nil, fmt.Errorf("source %q: %w", path, ErrNotDirectory)
 		}
 
-		data, err := fs.ReadFile(fsys, path)
+		err = s.loadFromFS(os.DirFS(path), path, cfg)
 		if err != nil {
-			return fmt.Errorf("reading %s: %w", path, err)
+			return nil, err
 		}
+	}
 
-		entry, err := parseMarkdown(data)
+	// Load builtin content if enabled
+	if cfg.BuiltinEnabled() && builtinFS != nil {
+		err := s.loadFromFS(builtinFS, "builtin", cfg)
 		if err != nil {
-			return fmt.Errorf("parsing %s: %w", path, err)
+			return nil, err
 		}
-
-		// Validate entry type
-		if !entry.Type.Valid() {
-			return fmt.Errorf("parsing %s: %w: %q", path, ErrInvalidType, entry.Type)
-		}
-
-		// Derive name from filename
-		name := strings.TrimSuffix(path, ".md")
-		if idx := strings.LastIndex(name, "/"); idx != -1 {
-			name = name[idx+1:]
-		}
-
-		entry.Name = name
-
-		if _, exists := s.entries[entry.Type]; !exists {
-			s.entries[entry.Type] = make(map[string]*Entry)
-		}
-
-		s.entries[entry.Type][entry.Name] = entry
-
-		return nil
-	})
-	if err != nil {
-		return nil, fmt.Errorf("walking filesystem: %w", err)
 	}
 
 	return s, nil
@@ -123,6 +111,67 @@ func (s *Store) Search(query string) []*Entry {
 	})
 
 	return results
+}
+
+// loadFromFS loads entries from a filesystem into the store.
+// sourceName is used for error messages to identify the source.
+func (s *Store) loadFromFS(fsys fs.FS, sourceName string, cfg *Config) error {
+	err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, walkErr error) error {
+		if walkErr != nil {
+			return walkErr
+		}
+
+		if d.IsDir() || !strings.HasSuffix(path, ".md") {
+			return nil
+		}
+
+		data, readErr := fs.ReadFile(fsys, path)
+		if readErr != nil {
+			return fmt.Errorf("reading %s: %w", path, readErr)
+		}
+
+		entry, parseErr := parseMarkdown(data)
+		if parseErr != nil {
+			return fmt.Errorf("parsing %s: %w", path, parseErr)
+		}
+
+		// Validate entry type
+		if !entry.Type.Valid() {
+			return fmt.Errorf("parsing %s: %w: %q", path, ErrInvalidType, entry.Type)
+		}
+
+		// Derive name from filename
+		name := strings.TrimSuffix(path, ".md")
+		if idx := strings.LastIndex(name, "/"); idx != -1 {
+			name = name[idx+1:]
+		}
+
+		entry.Name = name
+
+		// Check if entry is allowed by filter
+		filter := cfg.FilterForType(entry.Type)
+		if !filter.IsAllowed(entry.Name) {
+			return nil // Skip filtered entries
+		}
+
+		// Check for duplicates
+		if _, exists := s.entries[entry.Type]; !exists {
+			s.entries[entry.Type] = make(map[string]*Entry)
+		}
+
+		if _, exists := s.entries[entry.Type][entry.Name]; exists {
+			return fmt.Errorf("%s %q from %s: %w (already loaded)", entry.Type, entry.Name, sourceName, ErrDuplicate)
+		}
+
+		s.entries[entry.Type][entry.Name] = entry
+
+		return nil
+	})
+	if err != nil {
+		return fmt.Errorf("loading %s: %w", sourceName, err)
+	}
+
+	return nil
 }
 
 // matches checks if an entry matches the search query.
