@@ -1,6 +1,5 @@
 ---
 type: rule
-name: naming
 description: Guidelines for naming variables, functions, and types
 tags: [naming, readability, style]
 ---

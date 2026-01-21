@@ -1,6 +1,5 @@
 ---
 type: skill
-name: code-review
 description: Skill for performing thorough code reviews
 tags: [review, quality, feedback]
 ---

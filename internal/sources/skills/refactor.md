@@ -1,6 +1,5 @@
 ---
 type: skill
-name: refactor
 description: Skill for refactoring code while preserving behavior
 tags: [refactoring, improvement, clean-code]
 ---

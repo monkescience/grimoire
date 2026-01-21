@@ -1,6 +1,5 @@
 ---
 type: skill
-name: debug
 description: Systematic approach to finding and fixing bugs
 tags: [debugging, troubleshooting, problem-solving]
 ---

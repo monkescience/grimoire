@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "grimoire": {
+      "type": "local",
+      "command": ["go", "run", "./cmd/grimoire"],
+      "enabled": true
+    }
+  }
+}

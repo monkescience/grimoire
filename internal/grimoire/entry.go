@@ -22,8 +22,8 @@ func (t Type) Valid() bool {
 
 // Entry represents a piece of content with metadata and body.
 type Entry struct {
-	// Name is the unique identifier for this entry.
-	Name string `yaml:"name"`
+	// Name is the unique identifier, derived from filename.
+	Name string `yaml:"-"`
 
 	// Type indicates what kind of content this is.
 	Type Type `yaml:"type"`

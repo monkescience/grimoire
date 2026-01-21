@@ -47,15 +47,13 @@ func New(fsys fs.FS) (*Store, error) {
 			return fmt.Errorf("parsing %s: %w: %q", path, ErrInvalidType, entry.Type)
 		}
 
-		// Use filename (without extension) as name if not specified
-		if entry.Name == "" {
-			name := strings.TrimSuffix(path, ".md")
-			if idx := strings.LastIndex(name, "/"); idx != -1 {
-				name = name[idx+1:]
-			}
-
-			entry.Name = name
+		// Derive name from filename
+		name := strings.TrimSuffix(path, ".md")
+		if idx := strings.LastIndex(name, "/"); idx != -1 {
+			name = name[idx+1:]
 		}
+
+		entry.Name = name
 
 		if _, exists := s.entries[entry.Type]; !exists {
 			s.entries[entry.Type] = make(map[string]*Entry)
