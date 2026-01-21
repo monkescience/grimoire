@@ -39,29 +39,39 @@ func BuildGuidanceDescription(s *Store) string {
 func BuildServerInstructions(s *Store) string {
 	var b strings.Builder
 
-	b.WriteString("Grimoire provides guidance and knowledge. ")
-	b.WriteString("Use the guidance tool to load relevant content when users need help.\n\n")
+	b.WriteString("Grimoire provides project-specific guidance.\n\n")
+	b.WriteString("IMPORTANT: Check relevant RULES before answering questions about their topics.\n")
+	b.WriteString("Rules define conventions this project follows.\n\n")
 
-	// Collect all entry names for examples
-	skills := s.List(TypeSkill)
+	// Rules section with trigger hints from tags
 	rules := s.List(TypeRule)
-	examples := make([]string, 0, len(skills)+len(rules))
+	if len(rules) > 0 {
+		b.WriteString("RULES (check BEFORE answering):\n")
 
-	for _, e := range skills {
-		examples = append(examples, fmt.Sprintf("For %s tasks, call guidance(name: %q)", e.Name, e.Name))
-	}
+		for _, e := range rules {
+			fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
 
-	for _, e := range rules {
-		examples = append(examples, fmt.Sprintf("For %s guidance, call guidance(name: %q)", e.Name, e.Name))
-	}
-
-	if len(examples) > 0 {
-		b.WriteString("Examples:\n")
-
-		for _, ex := range examples {
-			fmt.Fprintf(&b, "- %s\n", ex)
+			if len(e.Tags) > 0 {
+				fmt.Fprintf(&b, "  Topics: %s\n", strings.Join(e.Tags, ", "))
+			}
 		}
+
+		b.WriteString("\n")
 	}
+
+	// Skills section
+	skills := s.List(TypeSkill)
+	if len(skills) > 0 {
+		b.WriteString("SKILLS (load for tasks):\n")
+
+		for _, e := range skills {
+			fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
+		}
+
+		b.WriteString("\n")
+	}
+
+	b.WriteString("Usage: guidance(name: \"<name>\")\n")
 
 	return b.String()
 }
