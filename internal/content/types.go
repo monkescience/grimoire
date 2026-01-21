@@ -9,6 +9,16 @@ const (
 	TypeSkill  Type = "skill"
 )
 
+// Valid returns true if the type is a known content type.
+func (t Type) Valid() bool {
+	switch t {
+	case TypeRule, TypePrompt, TypeSkill:
+		return true
+	default:
+		return false
+	}
+}
+
 // Entry represents a piece of content with metadata and body.
 type Entry struct {
 	// Name is the unique identifier for this entry.

@@ -2,8 +2,10 @@
 package store
 
 import (
+	"cmp"
 	"fmt"
 	"io/fs"
+	"slices"
 	"strings"
 
 	"github.com/monke/grimoire/internal/content"
@@ -44,9 +46,9 @@ func New(fsys fs.FS) (*Store, error) {
 			return fmt.Errorf("parsing %s: %w", path, err)
 		}
 
-		// Skip entries without a valid type
-		if entry.Type == "" {
-			return nil
+		// Validate entry type
+		if !entry.Type.Valid() {
+			return fmt.Errorf("parsing %s: %w: %q", path, ErrInvalidType, entry.Type)
 		}
 
 		// Use filename (without extension) as name if not specified
@@ -76,6 +78,10 @@ func New(fsys fs.FS) (*Store, error) {
 
 // Get retrieves a single entry by type and name.
 func (s *Store) Get(typ content.Type, name string) (*content.Entry, error) {
+	if name == "" {
+		return nil, fmt.Errorf("%s: %w", typ, ErrNameEmpty)
+	}
+
 	if entries, ok := s.entries[typ]; ok {
 		if entry, ok := entries[name]; ok {
 			return entry, nil
@@ -85,7 +91,7 @@ func (s *Store) Get(typ content.Type, name string) (*content.Entry, error) {
 	return nil, fmt.Errorf("%s %q: %w", typ, name, ErrNotFound)
 }
 
-// List returns all entries of a given type.
+// List returns all entries of a given type, sorted by name.
 func (s *Store) List(typ content.Type) []*content.Entry {
 	entries, ok := s.entries[typ]
 	if !ok {
@@ -97,10 +103,14 @@ func (s *Store) List(typ content.Type) []*content.Entry {
 		result = append(result, entry)
 	}
 
+	slices.SortFunc(result, func(a, b *content.Entry) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+
 	return result
 }
 
-// Search finds entries matching the query across all types.
+// Search finds entries matching the query across all types, sorted by name.
 func (s *Store) Search(query string) []*content.Entry {
 	query = strings.ToLower(query)
 
@@ -113,6 +123,10 @@ func (s *Store) Search(query string) []*content.Entry {
 			}
 		}
 	}
+
+	slices.SortFunc(results, func(a, b *content.Entry) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
 
 	return results
 }
