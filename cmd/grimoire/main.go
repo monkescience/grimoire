@@ -157,6 +157,11 @@ func buildConfig(f *flags) (*grimoire.Config, error) {
 	cfg.Skills.Allow = f.allowSkills
 	cfg.Skills.Block = f.blockSkills
 
+	err := cfg.Validate()
+	if err != nil {
+		return nil, fmt.Errorf("invalid config: %w", err)
+	}
+
 	return cfg, nil
 }
 

@@ -22,3 +22,6 @@ var ErrSourceNotFound = errors.New("source path not found")
 
 // ErrNotDirectory is returned when a source path is not a directory.
 var ErrNotDirectory = errors.New("not a directory")
+
+// ErrFilterConflict is returned when both allow and block are configured.
+var ErrFilterConflict = errors.New("allow and block cannot both be set")

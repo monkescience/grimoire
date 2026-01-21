@@ -76,7 +76,37 @@ func LoadConfig(path string) (*Config, error) {
 		cfg.Sources.Paths[i] = ExpandHome(p)
 	}
 
+	// Validate config
+	err = cfg.Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	return &cfg, nil
+}
+
+// Validate checks the configuration for errors.
+func (c *Config) Validate() error {
+	err := c.Rules.Validate("rules")
+	if err != nil {
+		return err
+	}
+
+	err = c.Skills.Validate("skills")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Validate checks the filter configuration for errors.
+func (f *FilterConfig) Validate(name string) error {
+	if len(f.Allow) > 0 && len(f.Block) > 0 {
+		return fmt.Errorf("%s: %w", name, ErrFilterConflict)
+	}
+
+	return nil
 }
 
 // ExpandHome expands ~ to the user's home directory.
