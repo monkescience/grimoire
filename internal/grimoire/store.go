@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 )
@@ -103,6 +104,57 @@ func (s *Store) Search(query string) []*Entry {
 			if matches(entry, query) {
 				results = append(results, entry)
 			}
+		}
+	}
+
+	slices.SortFunc(results, func(a, b *Entry) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+
+	return results
+}
+
+// FindByTopics returns all rules whose tags match any of the given topics.
+// Matching is case-insensitive.
+func (s *Store) FindByTopics(topics []string) []*Entry {
+	if len(topics) == 0 {
+		return nil
+	}
+
+	// Normalize topics for comparison
+	normalizedTopics := make([]string, len(topics))
+	for i, t := range topics {
+		normalizedTopics[i] = strings.ToLower(t)
+	}
+
+	var results []*Entry
+
+	// Only search rules (not skills) for topic matching
+	for _, entry := range s.entries[TypeRule] {
+		if matchesTopic(entry, normalizedTopics) {
+			results = append(results, entry)
+		}
+	}
+
+	slices.SortFunc(results, func(a, b *Entry) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+
+	return results
+}
+
+// FindByGlobs returns all rules whose glob patterns match any of the given file paths.
+func (s *Store) FindByGlobs(files []string) []*Entry {
+	if len(files) == 0 {
+		return nil
+	}
+
+	var results []*Entry
+
+	// Only search rules (not skills) for glob matching
+	for _, entry := range s.entries[TypeRule] {
+		if matchesGlob(entry, files) {
+			results = append(results, entry)
 		}
 	}
 
@@ -216,4 +268,37 @@ func matches(entry *Entry, query string) bool {
 	}
 
 	return strings.Contains(strings.ToLower(entry.Body), query)
+}
+
+// matchesTopic checks if an entry's tags match any of the normalized topics.
+func matchesTopic(entry *Entry, topics []string) bool {
+	for _, tag := range entry.Tags {
+		normalizedTag := strings.ToLower(tag)
+
+		if slices.Contains(topics, normalizedTag) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// matchesGlob checks if any of the entry's globs match any of the given files.
+func matchesGlob(entry *Entry, files []string) bool {
+	for _, pattern := range entry.Globs {
+		for _, file := range files {
+			// Match against full path and base name
+			matched, err := filepath.Match(pattern, file)
+			if err == nil && matched {
+				return true
+			}
+
+			matched, err = filepath.Match(pattern, filepath.Base(file))
+			if err == nil && matched {
+				return true
+			}
+		}
+	}
+
+	return false
 }

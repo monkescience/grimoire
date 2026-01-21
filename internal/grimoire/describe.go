@@ -10,7 +10,11 @@ import (
 func BuildGuidanceDescription(s *Store) string {
 	var b strings.Builder
 
-	b.WriteString("Load guidance by name for detailed instructions.\n")
+	b.WriteString("Load guidance for detailed instructions.\n\n")
+	b.WriteString("USAGE:\n")
+	b.WriteString("- guidance(name: \"<name>\") - Load specific guidance by name\n")
+	b.WriteString("- guidance(topics: [\"go\", \"errors\"]) - Find rules matching topics\n")
+	b.WriteString("- guidance(files: [\"main.go\"]) - Find rules matching file patterns\n")
 
 	// Skills section
 	skills := s.List(TypeSkill)
@@ -40,8 +44,9 @@ func BuildServerInstructions(s *Store) string {
 	var b strings.Builder
 
 	b.WriteString("Grimoire provides project-specific guidance.\n\n")
-	b.WriteString("IMPORTANT: Check relevant RULES before answering questions about their topics.\n")
-	b.WriteString("Rules define conventions this project follows.\n\n")
+	b.WriteString("IMPORTANT: Before answering questions or writing code, check for relevant rules:\n")
+	b.WriteString("- guidance(topics: [\"topic1\", \"topic2\"]) - when discussing specific topics\n")
+	b.WriteString("- guidance(files: [\"path/to/file.go\"]) - when working on files\n\n")
 
 	// Rules section with trigger hints from tags
 	rules := s.List(TypeRule)
@@ -54,6 +59,10 @@ func BuildServerInstructions(s *Store) string {
 			if len(e.Tags) > 0 {
 				fmt.Fprintf(&b, "  Topics: %s\n", strings.Join(e.Tags, ", "))
 			}
+
+			if len(e.Globs) > 0 {
+				fmt.Fprintf(&b, "  Files: %s\n", strings.Join(e.Globs, ", "))
+			}
 		}
 
 		b.WriteString("\n")
@@ -62,7 +71,7 @@ func BuildServerInstructions(s *Store) string {
 	// Skills section
 	skills := s.List(TypeSkill)
 	if len(skills) > 0 {
-		b.WriteString("SKILLS (load for tasks):\n")
+		b.WriteString("SKILLS (load for complex tasks):\n")
 
 		for _, e := range skills {
 			fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
@@ -70,8 +79,6 @@ func BuildServerInstructions(s *Store) string {
 
 		b.WriteString("\n")
 	}
-
-	b.WriteString("Usage: guidance(name: \"<name>\")\n")
 
 	return b.String()
 }

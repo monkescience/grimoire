@@ -2,6 +2,7 @@
 type: rule
 description: Use plain assignment for error handling, not inline
 tags: [go, errors, style]
+globs: ["*.go"]
 ---
 
 # Error Assignment

@@ -34,6 +34,9 @@ type Entry struct {
 	// Tags for categorization and search.
 	Tags []string `yaml:"tags"`
 
+	// Globs are file patterns that trigger this entry (e.g., "*.go").
+	Globs []string `yaml:"globs"`
+
 	// Body is the main content (markdown).
 	Body string `yaml:"-"`
 }
