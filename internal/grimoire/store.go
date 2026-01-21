@@ -140,13 +140,8 @@ func (s *Store) loadFromFS(fsys fs.FS, sourceName string, cfg *Config) error {
 			return fmt.Errorf("parsing %s: %w: %q", path, ErrInvalidType, entry.Type)
 		}
 
-		// Derive name from filename
-		name := strings.TrimSuffix(path, ".md")
-		if idx := strings.LastIndex(name, "/"); idx != -1 {
-			name = name[idx+1:]
-		}
-
-		entry.Name = name
+		// Derive name from path, stripping type prefix if present
+		entry.Name = deriveName(path, entry.Type)
 
 		// Check if entry is allowed by filter
 		filter := cfg.FilterForType(entry.Type)
@@ -172,6 +167,36 @@ func (s *Store) loadFromFS(fsys fs.FS, sourceName string, cfg *Config) error {
 	}
 
 	return nil
+}
+
+// deriveName extracts the entry name from the file path.
+// It removes the .md extension and strips type-based prefixes (e.g., "rules/", "skills/").
+// Examples:
+//   - "rules/go/error-assignment.md" -> "go/error-assignment"
+//   - "skills/refactor.md" -> "refactor"
+//   - "my-rule.md" -> "my-rule"
+func deriveName(path string, typ Type) string {
+	// Remove .md extension
+	name := strings.TrimSuffix(path, ".md")
+
+	// Try to strip type-based prefix (e.g., "rules/", "skills/")
+	prefixes := []string{
+		string(typ) + "s/", // "rules/", "skills/"
+		string(typ) + "/",  // "rule/", "skill/" (alternative)
+	}
+
+	for _, prefix := range prefixes {
+		if after, found := strings.CutPrefix(name, prefix); found {
+			return after
+		}
+	}
+
+	// No prefix found - use filename only (for flat structures)
+	if idx := strings.LastIndex(name, "/"); idx != -1 {
+		return name[idx+1:]
+	}
+
+	return name
 }
 
 // matches checks if an entry matches the search query.
