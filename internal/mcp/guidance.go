@@ -13,9 +13,8 @@ import (
 
 // guidanceInput is the input for the guidance tool.
 type guidanceInput struct {
-	Name   string   `json:"name,omitempty"   jsonschema:"Name of the guidance to load (exact match)"`
-	Topics []string `json:"topics,omitempty" jsonschema:"Topics to find matching rules (e.g., [go, errors])"`
-	Files  []string `json:"files,omitempty"  jsonschema:"File paths to find matching rules by globs (e.g., [main.go])"`
+	Name  string   `json:"name,omitempty"  jsonschema:"Name of the guidance to load"`
+	Names []string `json:"names,omitempty" jsonschema:"Multiple names to load in batch"`
 }
 
 func (s *Server) registerGuidance() {
@@ -30,94 +29,71 @@ func (s *Server) handleGuidance(
 	_ *mcp.CallToolRequest,
 	input guidanceInput,
 ) (*mcp.CallToolResult, any, error) {
-	// Handle exact name lookup (existing behavior)
+	// Handle single name lookup
 	if input.Name != "" {
-		return s.handleGuidanceByName(input.Name)
+		return s.handleGuidanceByName([]string{input.Name})
 	}
 
-	// Handle topic-based lookup
-	if len(input.Topics) > 0 {
-		return s.handleGuidanceByTopics(input.Topics)
-	}
-
-	// Handle file-based lookup
-	if len(input.Files) > 0 {
-		return s.handleGuidanceByFiles(input.Files)
+	// Handle batch name lookup
+	if len(input.Names) > 0 {
+		return s.handleGuidanceByName(input.Names)
 	}
 
 	return &mcp.CallToolResult{
 		IsError: true,
 		Content: []mcp.Content{
-			&mcp.TextContent{Text: "provide one of: name, topics, or files"},
+			&mcp.TextContent{Text: "provide name or names parameter"},
 		},
 	}, nil, nil
 }
 
-func (s *Server) handleGuidanceByName(name string) (*mcp.CallToolResult, any, error) {
-	slog.Debug("loading guidance by name", "name", name)
+func (s *Server) handleGuidanceByName(names []string) (*mcp.CallToolResult, any, error) {
+	slog.Debug("loading guidance by name", "names", names)
 
-	// Try each type until we find a match
-	for _, typ := range []grimoire.Type{grimoire.TypeSkill, grimoire.TypeRule} {
-		entry, err := s.store.Get(typ, name)
-		if err == nil {
-			slog.Debug("guidance loaded", "name", name, "type", typ)
+	var (
+		entries  []*grimoire.Entry
+		notFound []string
+	)
 
-			return &mcp.CallToolResult{
-				Content: []mcp.Content{
-					&mcp.TextContent{Text: entry.Body},
-				},
-			}, nil, nil
+	for _, name := range names {
+		found := false
+
+		for _, typ := range []grimoire.Type{grimoire.TypeSkill, grimoire.TypeRule} {
+			entry, err := s.store.Get(typ, name)
+			if err == nil {
+				entries = append(entries, entry)
+				found = true
+
+				break
+			}
+		}
+
+		if !found {
+			notFound = append(notFound, name)
 		}
 	}
 
-	slog.Warn("guidance not found", "name", name)
-
-	return &mcp.CallToolResult{
-		IsError: true,
-		Content: []mcp.Content{
-			&mcp.TextContent{Text: fmt.Sprintf("guidance %q not found", name)},
-		},
-	}, nil, nil
-}
-
-func (s *Server) handleGuidanceByTopics(topics []string) (*mcp.CallToolResult, any, error) {
-	slog.Debug("loading guidance by topics", "topics", topics)
-
-	entries := s.store.FindByTopics(topics)
 	if len(entries) == 0 {
+		slog.Warn("guidance not found", "names", notFound)
+
 		return &mcp.CallToolResult{
+			IsError: true,
 			Content: []mcp.Content{
-				&mcp.TextContent{Text: fmt.Sprintf("no rules found for topics: %v", topics)},
+				&mcp.TextContent{Text: fmt.Sprintf("guidance not found: %v", notFound)},
 			},
 		}, nil, nil
 	}
 
-	slog.Debug("guidance loaded by topics", "topics", topics, "count", len(entries))
+	slog.Debug("guidance loaded", "count", len(entries), "not_found", notFound)
 
-	return &mcp.CallToolResult{
-		Content: []mcp.Content{
-			&mcp.TextContent{Text: formatEntries(entries)},
-		},
-	}, nil, nil
-}
-
-func (s *Server) handleGuidanceByFiles(files []string) (*mcp.CallToolResult, any, error) {
-	slog.Debug("loading guidance by files", "files", files)
-
-	entries := s.store.FindByGlobs(files)
-	if len(entries) == 0 {
-		return &mcp.CallToolResult{
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: fmt.Sprintf("no rules found for files: %v", files)},
-			},
-		}, nil, nil
+	result := formatEntries(entries)
+	if len(notFound) > 0 {
+		result += fmt.Sprintf("\n\n---\nNot found: %v", notFound)
 	}
 
-	slog.Debug("guidance loaded by files", "files", files, "count", len(entries))
-
 	return &mcp.CallToolResult{
 		Content: []mcp.Content{
-			&mcp.TextContent{Text: formatEntries(entries)},
+			&mcp.TextContent{Text: result},
 		},
 	}, nil, nil
 }

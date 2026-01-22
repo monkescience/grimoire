@@ -49,3 +49,12 @@ func (e *Entry) FormatTags() string {
 
 	return " [" + strings.Join(e.Tags, ", ") + "]"
 }
+
+// FormatGlobs formats globs for display in descriptions.
+func (e *Entry) FormatGlobs() string {
+	if len(e.Globs) == 0 {
+		return ""
+	}
+
+	return " (" + strings.Join(e.Globs, ", ") + ")"
+}
