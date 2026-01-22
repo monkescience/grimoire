@@ -25,30 +25,25 @@ func (s *Server) registerGuidance() {
 }
 
 func (s *Server) handleGuidance(
-	_ context.Context,
+	ctx context.Context,
 	_ *mcp.CallToolRequest,
 	input guidanceInput,
 ) (*mcp.CallToolResult, any, error) {
 	// Handle single name lookup
 	if input.Name != "" {
-		return s.handleGuidanceByName([]string{input.Name})
+		return s.handleGuidanceByName(ctx, []string{input.Name})
 	}
 
 	// Handle batch name lookup
 	if len(input.Names) > 0 {
-		return s.handleGuidanceByName(input.Names)
+		return s.handleGuidanceByName(ctx, input.Names)
 	}
 
-	return &mcp.CallToolResult{
-		IsError: true,
-		Content: []mcp.Content{
-			&mcp.TextContent{Text: "provide name or names parameter"},
-		},
-	}, nil, nil
+	return errorResultMsg("provide name or names parameter"), nil, nil
 }
 
-func (s *Server) handleGuidanceByName(names []string) (*mcp.CallToolResult, any, error) {
-	slog.Debug("loading guidance by name", "names", names)
+func (s *Server) handleGuidanceByName(ctx context.Context, names []string) (*mcp.CallToolResult, any, error) {
+	slog.DebugContext(ctx, "loading guidance by name", "names", names)
 
 	var (
 		entries  []*grimoire.Entry
@@ -74,17 +69,12 @@ func (s *Server) handleGuidanceByName(names []string) (*mcp.CallToolResult, any,
 	}
 
 	if len(entries) == 0 {
-		slog.Warn("guidance not found", "names", notFound)
+		slog.WarnContext(ctx, "guidance not found", "names", notFound)
 
-		return &mcp.CallToolResult{
-			IsError: true,
-			Content: []mcp.Content{
-				&mcp.TextContent{Text: fmt.Sprintf("guidance not found: %v", notFound)},
-			},
-		}, nil, nil
+		return errorResultMsg(fmt.Sprintf("guidance not found: %v", notFound)), nil, nil
 	}
 
-	slog.Debug("guidance loaded", "count", len(entries), "not_found", notFound)
+	slog.DebugContext(ctx, "guidance loaded", "count", len(entries), "not_found", notFound)
 
 	result := formatEntries(entries)
 	if len(notFound) > 0 {

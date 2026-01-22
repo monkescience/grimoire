@@ -25,3 +25,6 @@ var ErrNotDirectory = errors.New("not a directory")
 
 // ErrFilterConflict is returned when both allow and block are configured.
 var ErrFilterConflict = errors.New("allow and block cannot both be set")
+
+// ErrInvalidGlob is returned when a glob pattern is malformed.
+var ErrInvalidGlob = errors.New("invalid glob pattern")

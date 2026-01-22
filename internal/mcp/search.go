@@ -20,15 +20,15 @@ func (s *Server) registerSearch() {
 }
 
 func (s *Server) handleSearch(
-	_ context.Context,
+	ctx context.Context,
 	_ *mcp.CallToolRequest,
 	input searchInput,
 ) (*mcp.CallToolResult, any, error) {
-	slog.Debug("searching", "query", input.Query)
+	slog.DebugContext(ctx, "searching", "query", input.Query)
 
 	entries := s.store.Search(input.Query)
 
-	slog.Debug("search completed", "query", input.Query, "results", len(entries))
+	slog.DebugContext(ctx, "search completed", "query", input.Query, "results", len(entries))
 
-	return s.entrySummaryResult(entries), nil, nil
+	return s.entrySummaryResult(ctx, entries), nil, nil
 }

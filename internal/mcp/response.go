@@ -1,6 +1,7 @@
 package mcp
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log/slog"
@@ -18,7 +19,7 @@ type entrySummary struct {
 	Tags        []string `json:"tags,omitempty"`
 }
 
-func (s *Server) entrySummaryResult(entries []*grimoire.Entry) *mcp.CallToolResult {
+func (s *Server) entrySummaryResult(ctx context.Context, entries []*grimoire.Entry) *mcp.CallToolResult {
 	summaries := make([]entrySummary, len(entries))
 	for i, e := range entries {
 		summaries[i] = entrySummary{
@@ -31,7 +32,7 @@ func (s *Server) entrySummaryResult(entries []*grimoire.Entry) *mcp.CallToolResu
 
 	data, err := json.MarshalIndent(summaries, "", "  ")
 	if err != nil {
-		slog.Error("failed to marshal entry summaries", "error", err)
+		slog.ErrorContext(ctx, "failed to marshal entry summaries", "error", err)
 
 		return errorResult(err)
 	}
@@ -44,12 +45,13 @@ func (s *Server) entrySummaryResult(entries []*grimoire.Entry) *mcp.CallToolResu
 }
 
 func (s *Server) getResourceContents(
+	ctx context.Context,
 	typ grimoire.Type,
 	name, uri string,
 ) (*mcp.ReadResourceResult, error) {
 	entry, err := s.store.Get(typ, name)
 	if err != nil {
-		slog.Warn("failed to get resource contents", "type", typ, "name", name, "error", err)
+		slog.WarnContext(ctx, "failed to get resource contents", "type", typ, "name", name, "error", err)
 
 		return nil, fmt.Errorf("get %s %q: %w", typ, name, err)
 	}
@@ -66,10 +68,14 @@ func (s *Server) getResourceContents(
 }
 
 func errorResult(err error) *mcp.CallToolResult {
+	return errorResultMsg(err.Error())
+}
+
+func errorResultMsg(msg string) *mcp.CallToolResult {
 	return &mcp.CallToolResult{
 		IsError: true,
 		Content: []mcp.Content{
-			&mcp.TextContent{Text: err.Error()},
+			&mcp.TextContent{Text: msg},
 		},
 	}
 }

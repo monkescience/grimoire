@@ -1,6 +1,10 @@
 package grimoire
 
-import "strings"
+import (
+	"fmt"
+	"path/filepath"
+	"strings"
+)
 
 // Type represents the kind of content.
 type Type string
@@ -57,4 +61,16 @@ func (e *Entry) FormatGlobs() string {
 	}
 
 	return " (" + strings.Join(e.Globs, ", ") + ")"
+}
+
+// Validate checks the entry for errors.
+func (e *Entry) Validate() error {
+	for _, pattern := range e.Globs {
+		_, err := filepath.Match(pattern, "")
+		if err != nil {
+			return fmt.Errorf("%w: %q: %w", ErrInvalidGlob, pattern, err)
+		}
+	}
+
+	return nil
 }

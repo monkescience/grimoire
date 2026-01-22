@@ -192,6 +192,12 @@ func (s *Store) loadFromFS(fsys fs.FS, sourceName string, cfg *Config) error {
 			return fmt.Errorf("parsing %s: %w: %q", path, ErrInvalidType, entry.Type)
 		}
 
+		// Validate entry (globs, etc.)
+		validateErr := entry.Validate()
+		if validateErr != nil {
+			return fmt.Errorf("validating %s: %w", path, validateErr)
+		}
+
 		// Derive name from path, stripping type prefix if present
 		entry.Name = deriveName(path, entry.Type)
 
@@ -223,9 +229,11 @@ func (s *Store) loadFromFS(fsys fs.FS, sourceName string, cfg *Config) error {
 
 // deriveName extracts the entry name from the file path.
 // It removes the .md extension and strips type-based prefixes (e.g., "rules/", "skills/").
+// If no recognized prefix is found, the full relative path is preserved (minus extension).
 // Examples:
 //   - "rules/go/error-assignment.md" -> "go/error-assignment"
 //   - "skills/refactor.md" -> "refactor"
+//   - "custom/go/my-rule.md" -> "custom/go/my-rule"
 //   - "my-rule.md" -> "my-rule"
 func deriveName(path string, typ Type) string {
 	// Remove .md extension
@@ -243,11 +251,7 @@ func deriveName(path string, typ Type) string {
 		}
 	}
 
-	// No prefix found - use filename only (for flat structures)
-	if idx := strings.LastIndex(name, "/"); idx != -1 {
-		return name[idx+1:]
-	}
-
+	// No prefix found - preserve full relative path
 	return name
 }
 
