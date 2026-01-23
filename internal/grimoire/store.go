@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+const minWordLength = 3
+
 type Store struct {
 	entries map[Type]map[string]*Entry
 }
@@ -322,10 +324,9 @@ func matchesTask(entry *Entry, task string) bool {
 	}
 
 	// Tokenize task into words and check for matches
-	words := strings.Fields(task)
-	for _, word := range words {
+	for word := range strings.FieldsSeq(task) {
 		// Skip very short words (articles, prepositions)
-		if len(word) < 3 {
+		if len(word) < minWordLength {
 			continue
 		}
 
