@@ -38,8 +38,8 @@ func BuildGuidanceDescription(s *Store) string {
 	return b.String()
 }
 
-// BuildServerInstructions generates the server instructions from store content.
-func BuildServerInstructions(s *Store) string {
+// BuildServerInstructions generates the server instructions.
+func BuildServerInstructions() string {
 	var b strings.Builder
 
 	b.WriteString("Grimoire provides project-specific coding guidance through skills and rules.\n\n")
@@ -47,7 +47,7 @@ func BuildServerInstructions(s *Store) string {
 	b.WriteString("→ Load the full skill when starting a matching task.\n\n")
 	b.WriteString("RULES define project conventions for file types (matched by tags/globs).\n")
 	b.WriteString("→ Apply rules based on their description. Load only if you need examples.\n\n")
-	b.WriteString("Use guidance(name: \"...\") to load, search(query: \"...\") to find.\n")
+	b.WriteString("Use guidance(name: \"rule-name\") to load, search(query: \"...\") to find.\n")
 
 	return b.String()
 }
