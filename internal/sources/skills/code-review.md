@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Performing thorough code reviews
+trigger: When reviewing code for quality
 tags: [review, quality, feedback]
 agents: [security-review, performance-review]
 ---

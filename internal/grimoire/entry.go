@@ -36,6 +36,9 @@ type Entry struct {
 	Description string   `yaml:"description"`
 	Tags        []string `yaml:"tags"`
 
+	// Trigger describes when a skill should be loaded (e.g., "When committing code").
+	Trigger string `yaml:"trigger"`
+
 	// Globs are file patterns that trigger this entry (e.g., "*.go").
 	Globs []string `yaml:"globs"`
 

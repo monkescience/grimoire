@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Finding and fixing bugs systematically
+trigger: When debugging an issue
 tags: [debugging, troubleshooting, problem-solving]
 ---
 

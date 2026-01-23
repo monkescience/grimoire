@@ -43,10 +43,14 @@ func BuildServerInstructions(s *Store) string {
 
 	skills := s.List(TypeSkill)
 	if len(skills) > 0 {
-		b.WriteString("SKILLS - Load and follow BEFORE starting tasks:\n")
+		b.WriteString("SKILLS - Load with guidance(name) BEFORE these tasks:\n")
 
 		for _, e := range skills {
-			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, e.FormatTags(), e.Description)
+			if e.Trigger != "" {
+				fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Trigger)
+			} else {
+				fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
+			}
 		}
 
 		b.WriteString("\n")

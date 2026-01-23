@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Plan the implementation of a feature or task
+trigger: When planning a feature or complex task
 tags: [planning, architecture, design]
 arguments:
   - name: task

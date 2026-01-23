@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Managing git commits and pull requests
+trigger: When working with git branches or PRs
 tags: [git, commits, pull-requests]
 ---
 

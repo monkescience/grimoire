@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Writing well-structured tests
+trigger: When writing or updating tests
 tags: [testing, tests, tdd]
 ---
 

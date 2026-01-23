@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Refactoring code while preserving behavior
+trigger: When refactoring code
 tags: [refactoring, improvement, clean-code]
 ---
 

@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Review a pull request thoroughly
+trigger: When reviewing a pull request
 tags: [git, pull-requests, review, github]
 arguments:
   - name: pr

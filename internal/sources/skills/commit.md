@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Create a well-structured git commit
+trigger: When committing code
 tags: [git, commits, version-control]
 arguments:
   - name: message
