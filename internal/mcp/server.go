@@ -25,11 +25,12 @@ func New(version string, s *grimoire.Store) *Server {
 				Name:    "grimoire",
 				Version: version,
 			},
-			nil,
+			&mcp.ServerOptions{
+				Instructions: grimoire.BuildServerInstructions(s),
+			},
 		),
 	}
 
-	srv.registerInstructions()
 	srv.registerGuidance()
 	srv.registerSearch()
 	srv.registerSuggest()
