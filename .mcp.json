@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "grimoire": {
+      "command": "go",
+      "args": ["run", "./cmd/grimoire"]
+    }
+  }
+}
