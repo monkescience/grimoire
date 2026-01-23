@@ -56,8 +56,9 @@ func BuildServerInstructions(s *Store) string {
 	var b strings.Builder
 
 	b.WriteString("Grimoire provides project-specific coding guidance through skills, rules, and agents.\n\n")
-	b.WriteString("SKILLS define HOW to perform tasks (review, refactor, debug).\n")
-	b.WriteString("→ Load the full skill when starting a matching task.\n\n")
+	b.WriteString("SKILLS define HOW to perform tasks (commit, review, debug, refactor).\n")
+	b.WriteString("→ Use suggest(task: \"...\") to find skills before starting tasks.\n")
+	b.WriteString("→ Load with guidance(name: \"skill-name\").\n\n")
 	b.WriteString("RULES define project conventions for file types (matched by tags/globs).\n")
 	b.WriteString("→ Apply rules based on their description. Load only if you need examples.\n\n")
 	b.WriteString("AGENTS are subagent prompts for specialized tasks (requires MCP sampling).\n")

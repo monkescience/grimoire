@@ -167,6 +167,29 @@ func (s *Store) FindByGlobs(files []string) []*Entry {
 	return results
 }
 
+// FindByTriggers returns all skills whose triggers match the given task description.
+func (s *Store) FindByTriggers(task string) []*Entry {
+	if task == "" {
+		return nil
+	}
+
+	task = strings.ToLower(task)
+
+	var results []*Entry
+
+	for _, entry := range s.entries[TypeSkill] {
+		if matchesTrigger(entry, task) {
+			results = append(results, entry)
+		}
+	}
+
+	slices.SortFunc(results, func(a, b *Entry) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+
+	return results
+}
+
 // loadFromFS loads entries from a filesystem into the store.
 // sourceName is used for error messages to identify the source.
 func (s *Store) loadFromFS(fsys fs.FS, sourceName string, cfg *Config) error {
@@ -293,7 +316,6 @@ func matchesTopic(entry *Entry, topics []string) bool {
 func matchesGlob(entry *Entry, files []string) bool {
 	for _, pattern := range entry.Globs {
 		for _, file := range files {
-			// Match against full path and base name
 			matched, err := filepath.Match(pattern, file)
 			if err == nil && matched {
 				return true
@@ -303,6 +325,17 @@ func matchesGlob(entry *Entry, files []string) bool {
 			if err == nil && matched {
 				return true
 			}
+		}
+	}
+
+	return false
+}
+
+// matchesTrigger checks if the task contains any of the entry's tags.
+func matchesTrigger(entry *Entry, task string) bool {
+	for _, tag := range entry.Tags {
+		if strings.Contains(task, strings.ToLower(tag)) {
+			return true
 		}
 	}
 
