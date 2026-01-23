@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Use consistent struct tag formatting with proper casing and spacing
-tags: [go, structs, style]
 globs: ["*.go"]
 ---
 

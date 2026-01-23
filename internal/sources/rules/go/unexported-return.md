@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Do not return unexported types from exported functions
-tags: [go, exports, api]
 globs: ["*.go"]
 ---
 

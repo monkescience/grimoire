@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Do not use naked returns, always specify return values explicitly
-tags: [go, returns, style]
 globs: ["*.go"]
 ---
 

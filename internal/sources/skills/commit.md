@@ -1,7 +1,10 @@
 ---
 type: skill
-trigger: When committing code
-tags: [git, commits, version-control]
+description: |
+  Create atomic, well-formatted git commits following Conventional Commits format.
+  Use when committing staged changes, crafting commit messages, or asking about
+  git commit best practices. Covers commit types (feat, fix, refactor, docs, test,
+  chore), scopes, breaking changes, and proper commit message formatting.
 ---
 
 # Commit

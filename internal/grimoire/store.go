@@ -107,8 +107,8 @@ func (s *Store) Search(query string) []*Entry {
 	return results
 }
 
-// FindByTopics returns all rules whose tags match any of the given topics.
-// Matching is case-insensitive.
+// FindByTopics returns all rules whose description matches any of the given topics.
+// Matching is case-insensitive substring match against description.
 func (s *Store) FindByTopics(topics []string) []*Entry {
 	if len(topics) == 0 {
 		return nil
@@ -124,7 +124,7 @@ func (s *Store) FindByTopics(topics []string) []*Entry {
 
 	// Only search rules (not skills) for topic matching
 	for _, entry := range s.entries[TypeRule] {
-		if matchesTopic(entry, normalizedTopics) {
+		if matchesTopics(entry, normalizedTopics) {
 			results = append(results, entry)
 		}
 	}
@@ -152,7 +152,9 @@ func (s *Store) FindByGlobs(files []string) []*Entry {
 	return results
 }
 
-func (s *Store) FindByTriggers(task string) []*Entry {
+// FindByTask returns all skills whose description matches the given task.
+// Matching is case-insensitive and checks if task keywords appear in description.
+func (s *Store) FindByTask(task string) []*Entry {
 	if task == "" {
 		return nil
 	}
@@ -162,7 +164,7 @@ func (s *Store) FindByTriggers(task string) []*Entry {
 	var results []*Entry
 
 	for _, entry := range s.entries[TypeSkill] {
-		if matchesTrigger(entry, task) {
+		if matchesTask(entry, task) {
 			results = append(results, entry)
 		}
 	}
@@ -274,20 +276,15 @@ func matchesQuery(entry *Entry, query string) bool {
 		return true
 	}
 
-	for _, tag := range entry.Tags {
-		if strings.Contains(strings.ToLower(tag), query) {
-			return true
-		}
-	}
-
 	return strings.Contains(strings.ToLower(entry.Body), query)
 }
 
-func matchesTopic(entry *Entry, topics []string) bool {
-	for _, tag := range entry.Tags {
-		normalizedTag := strings.ToLower(tag)
+// matchesTopics checks if any of the topics appear in the entry's description.
+func matchesTopics(entry *Entry, topics []string) bool {
+	desc := strings.ToLower(entry.Description)
 
-		if slices.Contains(topics, normalizedTag) {
+	for _, topic := range topics {
+		if strings.Contains(desc, topic) {
 			return true
 		}
 	}
@@ -313,9 +310,26 @@ func matchesGlob(entry *Entry, files []string) bool {
 	return false
 }
 
-func matchesTrigger(entry *Entry, task string) bool {
-	for _, tag := range entry.Tags {
-		if strings.Contains(task, strings.ToLower(tag)) {
+// matchesTask checks if the task description matches the skill's description.
+// It tokenizes the task into words and checks if any significant word
+// appears in the skill's description.
+func matchesTask(entry *Entry, task string) bool {
+	desc := strings.ToLower(entry.Description)
+
+	// Check if the full task appears as substring
+	if strings.Contains(desc, task) {
+		return true
+	}
+
+	// Tokenize task into words and check for matches
+	words := strings.Fields(task)
+	for _, word := range words {
+		// Skip very short words (articles, prepositions)
+		if len(word) < 3 {
+			continue
+		}
+
+		if strings.Contains(desc, word) {
 			return true
 		}
 	}

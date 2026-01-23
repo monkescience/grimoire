@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Use structured key-value pairs with type-safe constructors in slog
-tags: [go, logging, slog]
 globs: ["*.go"]
 ---
 

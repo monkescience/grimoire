@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Single-method interfaces should use -er suffix, multi-method interfaces should use descriptive names
-tags: [go, naming, interfaces]
 globs: ["*.go"]
 ---
 

@@ -1,7 +1,11 @@
 ---
 type: skill
-trigger: When writing or updating tests
-tags: [testing, tests, tdd]
+description: |
+  Write and update tests using the given-when-then pattern for clear test structure.
+  Use when writing unit tests, integration tests, or updating existing test suites.
+  Covers test organization, assertions, mocking, and test-driven development (TDD)
+  practices. Helps create readable, maintainable tests with clear setup, action,
+  and verification phases.
 ---
 
 # Testing

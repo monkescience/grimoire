@@ -1,7 +1,12 @@
 ---
 type: skill
-trigger: When reviewing code for quality
-tags: [review, quality, feedback]
+description: |
+  Review code for quality, correctness, and maintainability. Use when asked to
+  review code changes, evaluate code quality, or provide feedback on implementations.
+  Covers correctness, readability, maintainability, performance, security, and
+  testability. Provides structured feedback with location, severity, description,
+  and recommendations. Can delegate to security-review and performance-review agents
+  for specialized analysis.
 agents: [security-review, performance-review]
 ---
 

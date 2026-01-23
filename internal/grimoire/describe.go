@@ -27,11 +27,35 @@ func BuildAgentDescription(s *Store) string {
 		b.WriteString("\nAGENTS:\n")
 
 		for _, e := range agents {
-			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, e.FormatTags(), e.Description)
+			fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
 		}
 	}
 
 	return b.String()
+}
+
+// summarizeDescription returns a short summary of the description.
+// Uses the first sentence or line, truncated if too long.
+func summarizeDescription(desc string) string {
+	const maxLen = 120
+
+	// Find first sentence or line break
+	desc = strings.TrimSpace(desc)
+
+	if idx := strings.Index(desc, "\n"); idx > 0 && idx < maxLen {
+		desc = desc[:idx]
+	}
+
+	if idx := strings.Index(desc, ". "); idx > 0 && idx < maxLen {
+		desc = desc[:idx+1]
+	}
+
+	// Truncate if still too long
+	if len(desc) > maxLen {
+		desc = desc[:maxLen-3] + "..."
+	}
+
+	return desc
 }
 
 // BuildServerInstructions generates the server instructions.
@@ -46,11 +70,9 @@ func BuildServerInstructions(s *Store) string {
 		b.WriteString("SKILLS - Load with guidance(name) BEFORE these tasks:\n")
 
 		for _, e := range skills {
-			if e.Trigger != "" {
-				fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Trigger)
-			} else {
-				fmt.Fprintf(&b, "- %s: %s\n", e.Name, e.Description)
-			}
+			// Use first line of description as summary, or truncate if needed
+			summary := summarizeDescription(e.Description)
+			fmt.Fprintf(&b, "- %s: %s\n", e.Name, summary)
 		}
 
 		b.WriteString("\n")
@@ -61,7 +83,7 @@ func BuildServerInstructions(s *Store) string {
 		b.WriteString("RULES - Apply based on description, load with guidance() if you need examples:\n")
 
 		for _, e := range rules {
-			fmt.Fprintf(&b, "- %s%s%s: %s\n", e.Name, e.FormatTags(), e.FormatGlobs(), e.Description)
+			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, e.FormatGlobs(), e.Description)
 		}
 
 		b.WriteString("\n")

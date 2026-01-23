@@ -1,7 +1,12 @@
 ---
 type: skill
-trigger: When reviewing a pull request
-tags: [git, pull-requests, review, github]
+description: |
+  Review pull requests systematically and provide actionable feedback using
+  Conventional Comments format. Use when reviewing PRs, checking code changes,
+  or evaluating merge requests on GitHub/GitLab. Covers code quality, correctness,
+  testing, security, and performance aspects. Provides structured feedback with
+  labels like praise, suggestion, issue, nitpick, and appropriate blocking/non-blocking
+  decorations.
 arguments:
   - name: pr
     description: PR number or URL to review

@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Return interfaces from constructors to hide implementation details
-tags: [go, interfaces, api]
 globs: ["*.go"]
 ---
 

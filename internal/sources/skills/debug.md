@@ -1,7 +1,11 @@
 ---
 type: skill
-trigger: When debugging an issue
-tags: [debugging, troubleshooting, problem-solving]
+description: |
+  Debug issues systematically using a structured approach. Use when troubleshooting
+  bugs, investigating errors, diagnosing problems, or fixing unexpected behavior.
+  Covers reproduction, information gathering, hypothesis formation, testing,
+  isolation techniques, and verification. Helps find root causes efficiently
+  through binary search, logging, and methodical elimination.
 ---
 
 # Debugging

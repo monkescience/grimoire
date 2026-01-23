@@ -1,7 +1,11 @@
 ---
 type: skill
-trigger: When planning a feature or complex task
-tags: [planning, architecture, design]
+description: |
+  Create detailed implementation plans before writing code. Use when planning
+  new features, complex tasks, architectural changes, or multi-step implementations.
+  Helps break down work into concrete steps, identify affected files, consider
+  dependencies, and define testing strategies. Produces structured plans with
+  overview, approach, implementation steps, testing strategy, and risk assessment.
 arguments:
   - name: task
     description: The task or feature to plan

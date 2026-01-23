@@ -14,10 +14,9 @@ import (
 // entrySummary is a lightweight representation of an entry for tool result output.
 // Used by search and suggest tools to return concise entry information.
 type entrySummary struct {
-	Name        string   `json:"name"`
-	Type        string   `json:"type"`
-	Description string   `json:"description,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Description string `json:"description,omitempty"`
 }
 
 func (s *Server) entrySummaryResult(ctx context.Context, entries []*grimoire.Entry) *mcp.CallToolResult {
@@ -27,7 +26,6 @@ func (s *Server) entrySummaryResult(ctx context.Context, entries []*grimoire.Ent
 			Name:        e.Name,
 			Type:        string(e.Type),
 			Description: e.Description,
-			Tags:        e.Tags,
 		}
 	}
 

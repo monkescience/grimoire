@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Use log/slog for logging instead of log or fmt.Print
-tags: [go, logging, slog]
 globs: ["*.go"]
 ---
 

@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Use context-aware slog functions (DebugContext, InfoContext, etc.) when context is available
-tags: [go, logging, slog, context]
 globs: ["*.go"]
 ---
 

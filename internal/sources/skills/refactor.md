@@ -1,7 +1,11 @@
 ---
 type: skill
-trigger: When refactoring code
-tags: [refactoring, improvement, clean-code]
+description: |
+  Refactor code safely while preserving behavior. Use when improving code structure,
+  reducing duplication, renaming for clarity, extracting functions, or reorganizing
+  modules. Covers common refactoring patterns (extract, inline, rename, move) with
+  a safety-first approach: understand first, make incremental changes, run tests
+  after each change, and commit frequently.
 ---
 
 # Refactoring

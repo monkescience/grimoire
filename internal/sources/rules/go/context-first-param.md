@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Context should be the first parameter and named ctx
-tags: [go, context, functions]
 globs: ["*.go"]
 ---
 

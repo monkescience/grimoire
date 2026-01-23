@@ -10,7 +10,7 @@ import (
 type suggestInput struct {
 	Task   string   `json:"task,omitempty"   jsonschema:"Task description to find matching skills"`
 	Files  []string `json:"files,omitempty"  jsonschema:"File paths to match against rule globs"`
-	Topics []string `json:"topics,omitempty" jsonschema:"Topics/tags to match against rules"`
+	Topics []string `json:"topics,omitempty" jsonschema:"Keywords to match against rule descriptions"`
 }
 
 func (s *Server) registerSuggest() {
@@ -20,7 +20,7 @@ func (s *Server) registerSuggest() {
 
 - task: Find skills by task description (e.g., "commit", "review code")
 - files: Find rules by file patterns (e.g., ["main.go"])
-- topics: Find rules by topic tags (e.g., ["error-handling"])
+- topics: Find rules by keywords in description (e.g., ["error-handling"])
 
 Returns matching entries. Use the guidance tool to load full content.`,
 	}, s.handleSuggest)
@@ -37,7 +37,7 @@ func (s *Server) handleSuggest(
 		slog.Any("topics", input.Topics))
 
 	if input.Task != "" {
-		entries := s.store.FindByTriggers(input.Task)
+		entries := s.store.FindByTask(input.Task)
 
 		slog.DebugContext(ctx, "task-based suggestion completed",
 			slog.Int("results", len(entries)))

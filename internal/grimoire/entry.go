@@ -31,15 +31,16 @@ type Argument struct {
 }
 
 type Entry struct {
-	Name        string   `yaml:"-"`
-	Type        Type     `yaml:"type"`
-	Description string   `yaml:"description"`
-	Tags        []string `yaml:"tags"`
+	Name string `yaml:"-"`
+	Type Type   `yaml:"type"`
 
-	// Trigger describes when a skill should be loaded (e.g., "When committing code").
-	Trigger string `yaml:"trigger"`
+	// Description explains what this entry does and when to use it.
+	// For skills, this should be detailed (up to 1024 chars) to help agents
+	// understand when to activate the skill. Follows Agent Skills spec.
+	Description string `yaml:"description"`
 
 	// Globs are file patterns that trigger this entry (e.g., "*.go").
+	// Used primarily by rules.
 	Globs []string `yaml:"globs"`
 
 	// Order controls the injection order for instructions (lower = earlier).
@@ -52,14 +53,6 @@ type Entry struct {
 	Agents []string `yaml:"agents"`
 
 	Body string `yaml:"-"`
-}
-
-func (e *Entry) FormatTags() string {
-	if len(e.Tags) == 0 {
-		return ""
-	}
-
-	return " [" + strings.Join(e.Tags, ", ") + "]"
 }
 
 func (e *Entry) FormatGlobs() string {

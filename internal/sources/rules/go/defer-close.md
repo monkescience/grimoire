@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Defer Close() immediately after error check, not before
-tags: [go, resources, defer]
 globs: ["*.go"]
 ---
 

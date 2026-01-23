@@ -1,7 +1,6 @@
 ---
 type: agent
 description: Performance-focused code reviewer
-tags: [performance, review]
 max_tokens: 2048
 ---
 

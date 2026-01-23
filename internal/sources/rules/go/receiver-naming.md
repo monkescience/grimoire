@@ -1,7 +1,6 @@
 ---
 type: rule
 description: Use short (1-2 letter) receiver names based on the type name, never this or self
-tags: [go, naming, methods]
 globs: ["*.go"]
 ---
 

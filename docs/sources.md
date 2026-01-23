@@ -54,22 +54,35 @@ order: 10
 ## Skills
 
 Skills define HOW to perform specific tasks (debugging, code review, refactoring).
+Following the [Agent Skills specification](https://agentskills.io), skills use a rich
+description field that helps agents understand when to activate the skill.
 
 ### Frontmatter
 
 ```yaml
 ---
 type: skill
-description: <verb-ing phrase describing the activity>
-tags: [tag1, tag2, tag3]
+description: |
+  Detailed description of what this skill does and when to use it.
+  Should be 1-4 sentences covering the skill's purpose, when to activate it,
+  and what it helps accomplish. Keywords help with task matching.
 ---
 ```
 
 | Field | Required | Description |
 |-------|----------|-------------|
 | `type` | Yes | Must be `skill` |
-| `description` | Yes | Verb-ing phrase (e.g., "Performing thorough code reviews") |
-| `tags` | Yes | Keywords for search/categorization |
+| `description` | Yes | Rich description (up to 1024 chars) explaining what the skill does AND when to use it |
+| `arguments` | No | Parameters for templating with `{{argName}}` syntax |
+| `agents` | No | Agent names this skill can delegate to |
+
+### Description Guidelines
+
+The description is the primary field for skill activation. Write it to:
+
+1. **Explain what the skill does** - the capabilities it provides
+2. **Describe when to use it** - task patterns that should trigger activation
+3. **Include relevant keywords** - terms users might mention (e.g., "commit", "git", "version control")
 
 ### Body Format
 
@@ -82,8 +95,11 @@ tags: [tag1, tag2, tag3]
 ```markdown
 ---
 type: skill
-description: Writing well-structured tests
-tags: [testing, tests, tdd]
+description: |
+  Write and update tests using the given-when-then pattern for clear test structure.
+  Use when writing unit tests, integration tests, or updating existing test suites.
+  Covers test organization, assertions, mocking, and test-driven development (TDD)
+  practices.
 ---
 
 # Testing
@@ -107,7 +123,6 @@ Rules define project conventions and standards. They can be general or language-
 ---
 type: rule
 description: <concise statement of the rule>
-tags: [relevant, tags]
 globs: ["*.ext"]
 ---
 ```
@@ -116,7 +131,6 @@ globs: ["*.ext"]
 |-------|----------|-------------|
 | `type` | Yes | Must be `rule` |
 | `description` | Yes | Concise statement of what to do/avoid |
-| `tags` | Yes | Keywords for search/categorization |
 | `globs` | Recommended | File patterns this rule applies to |
 
 ### Body Format
@@ -155,7 +169,6 @@ Choose based on content type:
 ---
 type: rule
 description: Context should be the first parameter and named ctx
-tags: [go, context, functions]
 globs: ["*.go"]
 ---
 
@@ -197,7 +210,7 @@ internal/sources/
 
 ## How Rules are Applied
 
-The AI sees all rules listed by name, tags, globs, and description in the `guidance` tool. The server instructions tell the AI:
+The AI sees all rules listed by name, globs, and description in the `guidance` tool. The server instructions tell the AI:
 
 > "Apply rules based on their description. Load only if you need examples."
 
