@@ -67,6 +67,7 @@ Use Conventional Comments for feedback:
 - `suggestion:` Propose an alternative approach
 - `issue:` Must be addressed before merge
 - `question:` Seeking clarification
+- `thought:` Share an idea without requiring action
 
 ### Example Comments
 

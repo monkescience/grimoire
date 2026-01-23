@@ -2,13 +2,6 @@
 type: skill
 trigger: When committing code
 tags: [git, commits, version-control]
-arguments:
-  - name: message
-    description: Optional commit message to use or refine
-    required: false
-  - name: files
-    description: Specific files to focus on for the commit
-    required: false
 ---
 
 # Commit
@@ -27,8 +20,8 @@ Create a git commit for the staged changes.
    - Subject line only, max 72 characters
    - Use imperative mood ("add" not "added")
    - Be specific about what changed and why
-
-{{message}}
+   - Keep commits focused and atomic (one logical change per commit)
+   - Do not add Co-Authored-By lines
 
 3. **Commit Types**
    - `feat`: New feature (triggers release)
@@ -47,7 +40,19 @@ Create a git commit for the staged changes.
    - Identify affected component/module
    - Keep it short and consistent
 
-{{files}}
+## Breaking Changes
+
+Add `!` after type (or scope) to indicate a breaking change.
+
+For services: API contract changes (endpoints, request/response formats, auth flows)
+For libraries: Public API changes (exported functions, types, interfaces)
+
+When uncertain if a change is breaking, ask before committing.
+
+## History Rewriting
+
+- Do not use `git commit --amend` on commits that have been pushed
+- If a pushed commit needs fixing, create a new commit
 
 ## Examples
 
@@ -55,6 +60,7 @@ Good:
 - `feat(auth): add OAuth2 login support`
 - `fix(api): handle null response in user endpoint`
 - `refactor(utils): simplify date formatting logic`
+- `feat(api)!: change response format for /users endpoint`
 
 Bad:
 - `updated files` (vague)
