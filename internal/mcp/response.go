@@ -11,7 +11,8 @@ import (
 	"github.com/monke/grimoire/internal/grimoire"
 )
 
-// entrySummary is a lightweight representation of an entry for search results.
+// entrySummary is a lightweight representation of an entry for tool result output.
+// Used by search and suggest tools to return concise entry information.
 type entrySummary struct {
 	Name        string   `json:"name"`
 	Type        string   `json:"type"`

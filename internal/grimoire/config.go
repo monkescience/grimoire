@@ -2,6 +2,7 @@ package grimoire
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"slices"
@@ -126,6 +127,7 @@ func (f *FilterConfig) Validate(name string) error {
 }
 
 // ExpandHome expands ~ to the user's home directory.
+// If the home directory cannot be determined, returns the path unchanged and logs a warning.
 func ExpandHome(path string) string {
 	if !strings.HasPrefix(path, "~") {
 		return path
@@ -133,6 +135,8 @@ func ExpandHome(path string) string {
 
 	home, err := os.UserHomeDir()
 	if err != nil {
+		slog.Warn("failed to expand home directory", slog.String("path", path), slog.Any("error", err))
+
 		return path
 	}
 

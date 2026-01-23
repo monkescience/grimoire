@@ -14,11 +14,13 @@ import (
 
 var errUnexpectedContentType = errors.New("unexpected content type in sampling result")
 
+// agentInput is the input schema for the agent tool.
 type agentInput struct {
 	Names   []string `json:"names"             jsonschema:"Agent names to execute"`
 	Context string   `json:"context,omitempty" jsonschema:"Context provided to agents"`
 }
 
+// agentResult holds the output from a single agent execution.
 type agentResult struct {
 	Name   string
 	Output string
@@ -43,8 +45,8 @@ func (s *Server) handleAgent(
 		return errorResultMsg("names parameter is required"), nil, nil
 	}
 
-	caps := req.Session.InitializeParams().Capabilities
-	if caps == nil || caps.Sampling == nil {
+	params := req.Session.InitializeParams()
+	if params == nil || params.Capabilities == nil || params.Capabilities.Sampling == nil {
 		slog.WarnContext(ctx, "client does not support sampling")
 
 		return s.samplingNotSupported(), nil, nil
@@ -95,11 +97,6 @@ func (s *Server) executeSampling(
 	agent *grimoire.Entry,
 	context string,
 ) (string, error) {
-	maxTokens := agent.MaxTokens
-	if maxTokens == 0 {
-		maxTokens = 4096
-	}
-
 	prompt := agent.Body
 	if context != "" {
 		prompt = prompt + "\n\n## Context\n" + context
@@ -110,7 +107,6 @@ func (s *Server) executeSampling(
 			Role:    "user",
 			Content: &mcp.TextContent{Text: prompt},
 		}},
-		MaxTokens:    maxTokens,
 		SystemPrompt: agent.Description,
 	})
 	if err != nil {

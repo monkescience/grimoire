@@ -61,9 +61,6 @@ type Entry struct {
 	// Arguments defines parameters that skills can accept for templating.
 	Arguments []Argument `yaml:"arguments"`
 
-	// MaxTokens limits response length for agents (default: 4096).
-	MaxTokens int64 `yaml:"max_tokens"`
-
 	// Agents references agent names that this skill can delegate to.
 	Agents []string `yaml:"agents"`
 

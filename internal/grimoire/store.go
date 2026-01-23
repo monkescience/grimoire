@@ -88,9 +88,7 @@ func (s *Store) List(typ Type) []*Entry {
 		result = append(result, entry)
 	}
 
-	slices.SortFunc(result, func(a, b *Entry) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	sortEntriesByName(result)
 
 	return result
 }
@@ -103,15 +101,13 @@ func (s *Store) Search(query string) []*Entry {
 
 	for _, entries := range s.entries {
 		for _, entry := range entries {
-			if matches(entry, query) {
+			if matchesQuery(entry, query) {
 				results = append(results, entry)
 			}
 		}
 	}
 
-	slices.SortFunc(results, func(a, b *Entry) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	sortEntriesByName(results)
 
 	return results
 }
@@ -138,9 +134,7 @@ func (s *Store) FindByTopics(topics []string) []*Entry {
 		}
 	}
 
-	slices.SortFunc(results, func(a, b *Entry) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	sortEntriesByName(results)
 
 	return results
 }
@@ -160,9 +154,7 @@ func (s *Store) FindByGlobs(files []string) []*Entry {
 		}
 	}
 
-	slices.SortFunc(results, func(a, b *Entry) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	sortEntriesByName(results)
 
 	return results
 }
@@ -183,9 +175,7 @@ func (s *Store) FindByTriggers(task string) []*Entry {
 		}
 	}
 
-	slices.SortFunc(results, func(a, b *Entry) int {
-		return cmp.Compare(a.Name, b.Name)
-	})
+	sortEntriesByName(results)
 
 	return results
 }
@@ -280,8 +270,15 @@ func deriveName(path string, typ Type) string {
 	return name
 }
 
-// matches checks if an entry matches the search query.
-func matches(entry *Entry, query string) bool {
+// sortEntriesByName sorts entries alphabetically by name.
+func sortEntriesByName(entries []*Entry) {
+	slices.SortFunc(entries, func(a, b *Entry) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+}
+
+// matchesQuery checks if an entry matches the search query.
+func matchesQuery(entry *Entry, query string) bool {
 	if strings.Contains(strings.ToLower(entry.Name), query) {
 		return true
 	}
