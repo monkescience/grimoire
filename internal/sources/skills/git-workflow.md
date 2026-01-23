@@ -1,10 +1,12 @@
 ---
-type: instruction
-description: Git commits and pull request conventions
-order: 30
+type: skill
+description: Skill for git commits and pull request workflow
+tags: [git, commits, pull-requests]
 ---
 
-## Git & Pull Requests
+# Git Workflow
+
+## Commits
 
 - Use Conventional Commits: `type(scope): description`
 - Keep commits focused and atomic (one logical change per commit)
@@ -30,7 +32,7 @@ When uncertain if a change is breaking, ask before committing.
 - Do not use `git commit --amend` on commits that have been pushed
 - If a pushed commit needs fixing, create a new commit
 
-### Pull Request Reviews
+## Pull Request Reviews
 
 - Use Conventional Commits format for PR title
 - Keep description concise

@@ -1,10 +1,10 @@
 ---
-type: instruction
-description: Error handling principles
-order: 40
+type: rule
+description: Handle errors at boundaries, propagate with context, prefer returns over panics
+tags: [errors, error-handling]
 ---
 
-## Error Handling
+# Error Handling
 
 - Handle errors at appropriate boundaries (API, user input, external calls)
 - Propagate errors with context rather than swallowing them
