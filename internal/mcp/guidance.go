@@ -53,7 +53,7 @@ func (s *Server) handleGuidanceByName(ctx context.Context, names []string) (*mcp
 	for _, name := range names {
 		found := false
 
-		for _, typ := range []grimoire.Type{grimoire.TypeSkill, grimoire.TypeRule} {
+		for _, typ := range []grimoire.Type{grimoire.TypeSkill, grimoire.TypeRule, grimoire.TypeAgent} {
 			entry, err := s.store.Get(typ, name)
 			if err == nil {
 				entries = append(entries, entry)

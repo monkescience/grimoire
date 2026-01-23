@@ -37,6 +37,16 @@ func BuildGuidanceDescription(s *Store) string {
 		}
 	}
 
+	// Agents section
+	agents := s.List(TypeAgent)
+	if len(agents) > 0 {
+		b.WriteString("\nAGENTS:\n")
+
+		for _, e := range agents {
+			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, e.FormatTags(), e.Description)
+		}
+	}
+
 	return b.String()
 }
 
@@ -45,11 +55,13 @@ func BuildGuidanceDescription(s *Store) string {
 func BuildServerInstructions(s *Store) string {
 	var b strings.Builder
 
-	b.WriteString("Grimoire provides project-specific coding guidance through skills and rules.\n\n")
+	b.WriteString("Grimoire provides project-specific coding guidance through skills, rules, and agents.\n\n")
 	b.WriteString("SKILLS define HOW to perform tasks (review, refactor, debug).\n")
 	b.WriteString("→ Load the full skill when starting a matching task.\n\n")
 	b.WriteString("RULES define project conventions for file types (matched by tags/globs).\n")
 	b.WriteString("→ Apply rules based on their description. Load only if you need examples.\n\n")
+	b.WriteString("AGENTS are subagent prompts for specialized tasks (requires MCP sampling).\n")
+	b.WriteString("→ Execute via agent(names: [...]) when client supports sampling.\n\n")
 	b.WriteString("Use guidance(name: \"rule-name\") to load, search(query: \"...\") to find.\n")
 
 	// Append instruction entries

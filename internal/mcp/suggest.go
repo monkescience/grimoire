@@ -7,10 +7,9 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-// suggestInput is the input for the suggest tool.
 type suggestInput struct {
-	Files  []string `json:"files,omitempty"  jsonschema:"File paths to match against rule globs (e.g., [\"main.go\", \"src/utils.ts\"])"`
-	Topics []string `json:"topics,omitempty" jsonschema:"Topics/tags to match against rules (e.g., [\"error-handling\", \"testing\"])"`
+	Files  []string `json:"files,omitempty"  jsonschema:"File paths to match against rule globs"`
+	Topics []string `json:"topics,omitempty" jsonschema:"Topics/tags to match against rules"`
 }
 
 func (s *Server) registerSuggest() {

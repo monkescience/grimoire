@@ -13,12 +13,13 @@ const (
 	TypeRule        Type = "rule"
 	TypeSkill       Type = "skill"
 	TypeInstruction Type = "instruction"
+	TypeAgent       Type = "agent"
 )
 
 // Valid returns true if the type is a known content type.
 func (t Type) Valid() bool {
 	switch t {
-	case TypeRule, TypeSkill, TypeInstruction:
+	case TypeRule, TypeSkill, TypeInstruction, TypeAgent:
 		return true
 	default:
 		return false
@@ -59,6 +60,12 @@ type Entry struct {
 
 	// Arguments defines parameters that skills can accept for templating.
 	Arguments []Argument `yaml:"arguments"`
+
+	// MaxTokens limits response length for agents (default: 4096).
+	MaxTokens int64 `yaml:"max_tokens"`
+
+	// Agents references agent names that this skill can delegate to.
+	Agents []string `yaml:"agents"`
 
 	// Body is the main content (markdown).
 	Body string `yaml:"-"`

@@ -23,6 +23,9 @@ type Config struct {
 
 	// Instructions configures filtering for instructions.
 	Instructions FilterConfig `yaml:"instructions"`
+
+	// Agents configures filtering for agents.
+	Agents FilterConfig `yaml:"agents"`
 }
 
 // SourcesConfig configures content sources.
@@ -105,6 +108,11 @@ func (c *Config) Validate() error {
 		return err
 	}
 
+	err = c.Agents.Validate("agents")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -151,6 +159,8 @@ func (c *Config) FilterForType(typ Type) *FilterConfig {
 		return &c.Skills
 	case TypeInstruction:
 		return &c.Instructions
+	case TypeAgent:
+		return &c.Agents
 	default:
 		return &FilterConfig{}
 	}

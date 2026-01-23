@@ -25,6 +25,7 @@ func New(cfg *Config, builtinFS fs.FS) (*Store, error) {
 			TypeRule:        {},
 			TypeSkill:       {},
 			TypeInstruction: {},
+			TypeAgent:       {},
 		},
 	}
 

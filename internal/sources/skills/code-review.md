@@ -2,6 +2,7 @@
 type: skill
 description: Performing thorough code reviews
 tags: [review, quality, feedback]
+agents: [security-review, performance-review]
 ---
 
 # Code Review
