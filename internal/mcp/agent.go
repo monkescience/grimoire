@@ -30,7 +30,7 @@ type agentResult struct {
 func (s *Server) registerAgent() {
 	mcp.AddTool(s.mcp, &mcp.Tool{
 		Name:        "agent",
-		Description: "Execute agent prompts via MCP sampling. Requires client sampling support.",
+		Description: grimoire.BuildAgentDescription(s.store),
 	}, s.handleAgent)
 }
 
