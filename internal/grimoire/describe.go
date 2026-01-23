@@ -1,7 +1,9 @@
 package grimoire
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -39,7 +41,8 @@ func BuildGuidanceDescription(s *Store) string {
 }
 
 // BuildServerInstructions generates the server instructions.
-func BuildServerInstructions() string {
+// It includes all instruction entries sorted by order, then by name.
+func BuildServerInstructions(s *Store) string {
 	var b strings.Builder
 
 	b.WriteString("Grimoire provides project-specific coding guidance through skills and rules.\n\n")
@@ -48,6 +51,29 @@ func BuildServerInstructions() string {
 	b.WriteString("RULES define project conventions for file types (matched by tags/globs).\n")
 	b.WriteString("→ Apply rules based on their description. Load only if you need examples.\n\n")
 	b.WriteString("Use guidance(name: \"rule-name\") to load, search(query: \"...\") to find.\n")
+
+	// Append instruction entries
+	instructions := s.List(TypeInstruction)
+	if len(instructions) > 0 {
+		// Sort by order first, then by name
+		slices.SortFunc(instructions, func(a, b *Entry) int {
+			if a.Order != b.Order {
+				return cmp.Compare(a.Order, b.Order)
+			}
+
+			return cmp.Compare(a.Name, b.Name)
+		})
+
+		b.WriteString("\n---\n\n")
+
+		for i, instr := range instructions {
+			if i > 0 {
+				b.WriteString("\n")
+			}
+
+			b.WriteString(instr.Body)
+		}
+	}
 
 	return b.String()
 }

@@ -26,7 +26,7 @@ func New(version string, s *grimoire.Store) *Server {
 				Version: version,
 			},
 			&mcp.ServerOptions{
-				Instructions: grimoire.BuildServerInstructions(),
+				Instructions: grimoire.BuildServerInstructions(s),
 			},
 		),
 	}

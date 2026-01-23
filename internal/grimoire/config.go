@@ -20,6 +20,9 @@ type Config struct {
 
 	// Skills configures filtering for skills.
 	Skills FilterConfig `yaml:"skills"`
+
+	// Instructions configures filtering for instructions.
+	Instructions FilterConfig `yaml:"instructions"`
 }
 
 // SourcesConfig configures content sources.
@@ -97,6 +100,11 @@ func (c *Config) Validate() error {
 		return err
 	}
 
+	err = c.Instructions.Validate("instructions")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -141,6 +149,8 @@ func (c *Config) FilterForType(typ Type) *FilterConfig {
 		return &c.Rules
 	case TypeSkill:
 		return &c.Skills
+	case TypeInstruction:
+		return &c.Instructions
 	default:
 		return &FilterConfig{}
 	}

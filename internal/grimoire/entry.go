@@ -10,14 +10,15 @@ import (
 type Type string
 
 const (
-	TypeRule  Type = "rule"
-	TypeSkill Type = "skill"
+	TypeRule        Type = "rule"
+	TypeSkill       Type = "skill"
+	TypeInstruction Type = "instruction"
 )
 
 // Valid returns true if the type is a known content type.
 func (t Type) Valid() bool {
 	switch t {
-	case TypeRule, TypeSkill:
+	case TypeRule, TypeSkill, TypeInstruction:
 		return true
 	default:
 		return false
@@ -40,6 +41,9 @@ type Entry struct {
 
 	// Globs are file patterns that trigger this entry (e.g., "*.go").
 	Globs []string `yaml:"globs"`
+
+	// Order controls the injection order for instructions (lower = earlier).
+	Order int `yaml:"order"`
 
 	// Body is the main content (markdown).
 	Body string `yaml:"-"`

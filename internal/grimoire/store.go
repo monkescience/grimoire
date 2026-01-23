@@ -22,8 +22,9 @@ type Store struct {
 func New(cfg *Config, builtinFS fs.FS) (*Store, error) {
 	s := &Store{
 		entries: map[Type]map[string]*Entry{
-			TypeRule:  {},
-			TypeSkill: {},
+			TypeRule:        {},
+			TypeSkill:       {},
+			TypeInstruction: {},
 		},
 	}
 
