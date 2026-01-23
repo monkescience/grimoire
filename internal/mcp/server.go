@@ -33,6 +33,7 @@ func New(version string, s *grimoire.Store) *Server {
 
 	srv.registerGuidance()
 	srv.registerSearch()
+	srv.registerSuggest()
 	srv.registerResources()
 	srv.registerPrompts()
 

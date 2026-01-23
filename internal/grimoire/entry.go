@@ -25,6 +25,18 @@ func (t Type) Valid() bool {
 	}
 }
 
+// Argument describes a parameter that a skill can accept.
+type Argument struct {
+	// Name is the argument identifier used in templates.
+	Name string `yaml:"name"`
+
+	// Description explains what the argument is for.
+	Description string `yaml:"description"`
+
+	// Required indicates if the argument must be provided.
+	Required bool `yaml:"required"`
+}
+
 // Entry represents a piece of content with metadata and body.
 type Entry struct {
 	// Name is the unique identifier, derived from filename.
@@ -44,6 +56,9 @@ type Entry struct {
 
 	// Order controls the injection order for instructions (lower = earlier).
 	Order int `yaml:"order"`
+
+	// Arguments defines parameters that skills can accept for templating.
+	Arguments []Argument `yaml:"arguments"`
 
 	// Body is the main content (markdown).
 	Body string `yaml:"-"`
@@ -77,4 +92,18 @@ func (e *Entry) Validate() error {
 	}
 
 	return nil
+}
+
+// RenderBody substitutes argument values into the body using {{argName}} syntax.
+// Arguments not provided in values are replaced with empty strings.
+func (e *Entry) RenderBody(values map[string]string) string {
+	result := e.Body
+
+	for _, arg := range e.Arguments {
+		placeholder := "{{" + arg.Name + "}}"
+		value := values[arg.Name]
+		result = strings.ReplaceAll(result, placeholder, value)
+	}
+
+	return result
 }
