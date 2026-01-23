@@ -15,8 +15,8 @@ import (
 var errUnexpectedContentType = errors.New("unexpected content type in sampling result")
 
 type agentInput struct {
-	Names   []string `json:"names"             jsonschema:"description=Agent names to execute,required"`
-	Context string   `json:"context,omitempty" jsonschema:"description=Context provided to agents"`
+	Names   []string `json:"names"             jsonschema:"Agent names to execute"`
+	Context string   `json:"context,omitempty" jsonschema:"Context provided to agents"`
 }
 
 type agentResult struct {
