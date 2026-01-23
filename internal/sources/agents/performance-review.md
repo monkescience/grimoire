@@ -1,7 +1,6 @@
 ---
 type: agent
 description: Performance-focused code reviewer
-max_tokens: 2048
 ---
 
 Review the provided code for performance issues:

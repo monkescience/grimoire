@@ -1,7 +1,6 @@
 ---
 type: agent
 description: Security-focused code reviewer
-max_tokens: 2048
 ---
 
 Review the provided code for security vulnerabilities:
