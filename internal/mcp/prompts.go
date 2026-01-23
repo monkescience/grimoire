@@ -14,7 +14,7 @@ func (s *Server) registerPrompts() {
 
 	for _, skill := range skills {
 		s.mcp.AddPrompt(&mcp.Prompt{
-			Name:        "grimoire-" + skill.Name,
+			Name:        skill.Name,
 			Description: skill.Description,
 			Arguments:   convertArguments(skill.Arguments),
 		}, s.makePromptHandler(skill))
