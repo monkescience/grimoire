@@ -2,6 +2,7 @@
 type: rule
 description: Handle errors at boundaries, propagate with context, prefer returns over panics
 tags: [errors, error-handling]
+globs: ["*.go", "*.ts", "*.js", "*.py", "*.rs", "*.java", "*.rb", "*.c", "*.cpp", "*.h", "*.cs"]
 ---
 
 # Error Handling

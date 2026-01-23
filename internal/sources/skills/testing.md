@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Skill for writing well-structured tests
+description: Writing well-structured tests
 tags: [testing, tests, tdd]
 ---
 

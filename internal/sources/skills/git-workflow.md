@@ -1,6 +1,6 @@
 ---
 type: skill
-description: Skill for git commits and pull request workflow
+description: Managing git commits and pull requests
 tags: [git, commits, pull-requests]
 ---
 

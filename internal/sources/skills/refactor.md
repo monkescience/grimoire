@@ -1,10 +1,10 @@
 ---
 type: skill
-description: Skill for refactoring code while preserving behavior
+description: Refactoring code while preserving behavior
 tags: [refactoring, improvement, clean-code]
 ---
 
-# Code Refactoring Skill
+# Refactoring
 
 When refactoring code, follow these steps:
 

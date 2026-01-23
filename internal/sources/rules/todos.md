@@ -2,6 +2,7 @@
 type: rule
 description: Use explicit, scoped TODO comments for deferred work
 tags: [todos, comments, task-tracking]
+globs: ["*.go", "*.ts", "*.js", "*.py", "*.rs", "*.java", "*.rb", "*.c", "*.cpp", "*.h", "*.cs"]
 ---
 
 # TODO Comments

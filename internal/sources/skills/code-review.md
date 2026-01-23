@@ -1,10 +1,10 @@
 ---
 type: skill
-description: Skill for performing thorough code reviews
+description: Performing thorough code reviews
 tags: [review, quality, feedback]
 ---
 
-# Code Review Skill
+# Code Review
 
 You are a senior software engineer performing a code review. Review the provided code with attention to:
 

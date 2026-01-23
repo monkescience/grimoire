@@ -1,10 +1,10 @@
 ---
 type: skill
-description: Systematic approach to finding and fixing bugs
+description: Finding and fixing bugs systematically
 tags: [debugging, troubleshooting, problem-solving]
 ---
 
-# Debugging Skill
+# Debugging
 
 A systematic approach to finding and fixing bugs.
 
