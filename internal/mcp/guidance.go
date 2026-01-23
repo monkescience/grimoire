@@ -43,7 +43,7 @@ func (s *Server) handleGuidance(
 }
 
 func (s *Server) handleGuidanceByName(ctx context.Context, names []string) (*mcp.CallToolResult, any, error) {
-	slog.DebugContext(ctx, "loading guidance by name", "names", names)
+	slog.DebugContext(ctx, "loading guidance by name", slog.Any("names", names))
 
 	var (
 		entries  []*grimoire.Entry
@@ -69,12 +69,12 @@ func (s *Server) handleGuidanceByName(ctx context.Context, names []string) (*mcp
 	}
 
 	if len(entries) == 0 {
-		slog.WarnContext(ctx, "guidance not found", "names", notFound)
+		slog.WarnContext(ctx, "guidance not found", slog.Any("names", notFound))
 
 		return errorResultMsg(fmt.Sprintf("guidance not found: %v", notFound)), nil, nil
 	}
 
-	slog.DebugContext(ctx, "guidance loaded", "count", len(entries), "not_found", notFound)
+	slog.DebugContext(ctx, "guidance loaded", slog.Int("count", len(entries)), slog.Any("not_found", notFound))
 
 	result := formatEntries(entries)
 	if len(notFound) > 0 {

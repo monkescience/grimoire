@@ -46,7 +46,7 @@ func (s *Server) Run(ctx context.Context) error {
 
 	err := s.mcp.Run(ctx, &mcp.StdioTransport{})
 	if err != nil {
-		slog.Error("server stopped with error", "error", err)
+		slog.Error("server stopped with error", slog.Any("error", err))
 
 		return fmt.Errorf("mcp server: %w", err)
 	}

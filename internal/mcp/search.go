@@ -24,11 +24,11 @@ func (s *Server) handleSearch(
 	_ *mcp.CallToolRequest,
 	input searchInput,
 ) (*mcp.CallToolResult, any, error) {
-	slog.DebugContext(ctx, "searching", "query", input.Query)
+	slog.DebugContext(ctx, "searching", slog.String("query", input.Query))
 
 	entries := s.store.Search(input.Query)
 
-	slog.DebugContext(ctx, "search completed", "query", input.Query, "results", len(entries))
+	slog.DebugContext(ctx, "search completed", slog.String("query", input.Query), slog.Int("results", len(entries)))
 
 	return s.entrySummaryResult(ctx, entries), nil, nil
 }

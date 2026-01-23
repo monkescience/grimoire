@@ -40,7 +40,7 @@ func (s *Server) handleRuleResource(
 ) (*mcp.ReadResourceResult, error) {
 	name := strings.TrimPrefix(req.Params.URI, "grimoire://rules/")
 
-	slog.DebugContext(ctx, "reading rule resource", "name", name, "uri", req.Params.URI)
+	slog.DebugContext(ctx, "reading rule resource", slog.String("name", name), slog.String("uri", req.Params.URI))
 
 	return s.getResourceContents(ctx, grimoire.TypeRule, name, req.Params.URI)
 }
@@ -51,7 +51,7 @@ func (s *Server) handleSkillResource(
 ) (*mcp.ReadResourceResult, error) {
 	name := strings.TrimPrefix(req.Params.URI, "grimoire://skills/")
 
-	slog.DebugContext(ctx, "reading skill resource", "name", name, "uri", req.Params.URI)
+	slog.DebugContext(ctx, "reading skill resource", slog.String("name", name), slog.String("uri", req.Params.URI))
 
 	return s.getResourceContents(ctx, grimoire.TypeSkill, name, req.Params.URI)
 }

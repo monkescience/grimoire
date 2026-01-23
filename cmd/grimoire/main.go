@@ -49,7 +49,7 @@ type flags struct {
 func main() {
 	err := run()
 	if err != nil {
-		slog.Error("fatal error", "error", err)
+		slog.Error("fatal error", slog.Any("error", err))
 		os.Exit(1)
 	}
 }
@@ -70,7 +70,7 @@ func run() error {
 		return err
 	}
 
-	slog.Info("starting grimoire", "version", version)
+	slog.Info("starting grimoire", slog.String("version", version))
 
 	return runServer(cfg)
 }
@@ -134,7 +134,7 @@ func buildConfig(f *flags) (*grimoire.Config, error) {
 	}
 
 	if f.configFile != "" {
-		slog.Debug("loading config from file", "path", f.configFile)
+		slog.Debug("loading config from file", slog.String("path", f.configFile))
 
 		cfg, err := grimoire.LoadConfig(f.configFile)
 		if err != nil {

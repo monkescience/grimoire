@@ -32,7 +32,7 @@ func (s *Server) entrySummaryResult(ctx context.Context, entries []*grimoire.Ent
 
 	data, err := json.MarshalIndent(summaries, "", "  ")
 	if err != nil {
-		slog.ErrorContext(ctx, "failed to marshal entry summaries", "error", err)
+		slog.ErrorContext(ctx, "failed to marshal entry summaries", slog.Any("error", err))
 
 		return errorResult(err)
 	}
@@ -51,7 +51,8 @@ func (s *Server) getResourceContents(
 ) (*mcp.ReadResourceResult, error) {
 	entry, err := s.store.Get(typ, name)
 	if err != nil {
-		slog.WarnContext(ctx, "failed to get resource contents", "type", typ, "name", name, "error", err)
+		slog.WarnContext(ctx, "failed to get resource contents",
+			slog.String("type", string(typ)), slog.String("name", name), slog.Any("error", err))
 
 		return nil, fmt.Errorf("get %s %q: %w", typ, name, err)
 	}
