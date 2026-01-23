@@ -17,7 +17,6 @@ USAGE:
 - guidance(names: ["a", "b"]) - Load multiple`
 }
 
-// BuildAgentDescription generates the agent tool description from store content.
 func BuildAgentDescription(s *Store) string {
 	var b strings.Builder
 
@@ -42,7 +41,6 @@ func BuildServerInstructions(s *Store) string {
 
 	b.WriteString("Grimoire provides project-specific coding guidance.\n\n")
 
-	// Skills section
 	skills := s.List(TypeSkill)
 	if len(skills) > 0 {
 		b.WriteString("SKILLS - Load and follow BEFORE starting tasks:\n")
@@ -54,7 +52,6 @@ func BuildServerInstructions(s *Store) string {
 		b.WriteString("\n")
 	}
 
-	// Rules section
 	rules := s.List(TypeRule)
 	if len(rules) > 0 {
 		b.WriteString("RULES - Apply based on description, load with guidance() if you need examples:\n")
@@ -66,10 +63,8 @@ func BuildServerInstructions(s *Store) string {
 		b.WriteString("\n")
 	}
 
-	// Append instruction entries
 	instructions := s.List(TypeInstruction)
 	if len(instructions) > 0 {
-		// Sort by order first, then by name
 		slices.SortFunc(instructions, func(a, b *Entry) int {
 			if a.Order != b.Order {
 				return cmp.Compare(a.Order, b.Order)

@@ -10,7 +10,6 @@ import (
 	"strings"
 )
 
-// Store provides access to grimoire content.
 type Store struct {
 	entries map[Type]map[string]*Entry
 }
@@ -50,7 +49,6 @@ func New(cfg *Config, builtinFS fs.FS) (*Store, error) {
 		}
 	}
 
-	// Load builtin content if enabled
 	if cfg.BuiltinEnabled() && builtinFS != nil {
 		err := s.loadFromFS(builtinFS, "builtin", cfg)
 		if err != nil {
@@ -61,7 +59,6 @@ func New(cfg *Config, builtinFS fs.FS) (*Store, error) {
 	return s, nil
 }
 
-// Get retrieves a single entry by type and name.
 func (s *Store) Get(typ Type, name string) (*Entry, error) {
 	if name == "" {
 		return nil, fmt.Errorf("%s: %w", typ, ErrNameEmpty)
@@ -76,7 +73,6 @@ func (s *Store) Get(typ Type, name string) (*Entry, error) {
 	return nil, fmt.Errorf("%s %q: %w", typ, name, ErrNotFound)
 }
 
-// List returns all entries of a given type, sorted by name.
 func (s *Store) List(typ Type) []*Entry {
 	entries, ok := s.entries[typ]
 	if !ok {
@@ -93,7 +89,6 @@ func (s *Store) List(typ Type) []*Entry {
 	return result
 }
 
-// Search finds entries matching the query across all types, sorted by name.
 func (s *Store) Search(query string) []*Entry {
 	query = strings.ToLower(query)
 
@@ -139,7 +134,6 @@ func (s *Store) FindByTopics(topics []string) []*Entry {
 	return results
 }
 
-// FindByGlobs returns all rules whose glob patterns match any of the given file paths.
 func (s *Store) FindByGlobs(files []string) []*Entry {
 	if len(files) == 0 {
 		return nil
@@ -147,7 +141,6 @@ func (s *Store) FindByGlobs(files []string) []*Entry {
 
 	var results []*Entry
 
-	// Only search rules (not skills) for glob matching
 	for _, entry := range s.entries[TypeRule] {
 		if matchesGlob(entry, files) {
 			results = append(results, entry)
@@ -159,7 +152,6 @@ func (s *Store) FindByGlobs(files []string) []*Entry {
 	return results
 }
 
-// FindByTriggers returns all skills whose triggers match the given task description.
 func (s *Store) FindByTriggers(task string) []*Entry {
 	if task == "" {
 		return nil
@@ -251,10 +243,8 @@ func (s *Store) loadFromFS(fsys fs.FS, sourceName string, cfg *Config) error {
 //   - "custom/go/my-rule.md" -> "custom/go/my-rule"
 //   - "my-rule.md" -> "my-rule"
 func deriveName(path string, typ Type) string {
-	// Remove .md extension
 	name := strings.TrimSuffix(path, ".md")
 
-	// Try to strip type-based prefix (e.g., "rules/", "skills/")
 	prefixes := []string{
 		string(typ) + "s/", // "rules/", "skills/"
 		string(typ) + "/",  // "rule/", "skill/" (alternative)
@@ -266,18 +256,15 @@ func deriveName(path string, typ Type) string {
 		}
 	}
 
-	// No prefix found - preserve full relative path
 	return name
 }
 
-// sortEntriesByName sorts entries alphabetically by name.
 func sortEntriesByName(entries []*Entry) {
 	slices.SortFunc(entries, func(a, b *Entry) int {
 		return cmp.Compare(a.Name, b.Name)
 	})
 }
 
-// matchesQuery checks if an entry matches the search query.
 func matchesQuery(entry *Entry, query string) bool {
 	if strings.Contains(strings.ToLower(entry.Name), query) {
 		return true
@@ -296,7 +283,6 @@ func matchesQuery(entry *Entry, query string) bool {
 	return strings.Contains(strings.ToLower(entry.Body), query)
 }
 
-// matchesTopic checks if an entry's tags match any of the normalized topics.
 func matchesTopic(entry *Entry, topics []string) bool {
 	for _, tag := range entry.Tags {
 		normalizedTag := strings.ToLower(tag)
@@ -309,7 +295,6 @@ func matchesTopic(entry *Entry, topics []string) bool {
 	return false
 }
 
-// matchesGlob checks if any of the entry's globs match any of the given files.
 func matchesGlob(entry *Entry, files []string) bool {
 	for _, pattern := range entry.Globs {
 		for _, file := range files {
@@ -328,7 +313,6 @@ func matchesGlob(entry *Entry, files []string) bool {
 	return false
 }
 
-// matchesTrigger checks if the task contains any of the entry's tags.
 func matchesTrigger(entry *Entry, task string) bool {
 	for _, tag := range entry.Tags {
 		if strings.Contains(task, strings.ToLower(tag)) {

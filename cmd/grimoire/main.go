@@ -20,7 +20,6 @@ var version = "dev"
 // errConfigConflict is returned when --config is combined with other flags.
 var errConfigConflict = errors.New("--config cannot be combined with --source, --no-builtin, or filter flags")
 
-// stringSlice implements flag.Value for repeated string flags.
 type stringSlice []string
 
 func (s *stringSlice) String() string {
@@ -33,7 +32,6 @@ func (s *stringSlice) Set(value string) error {
 	return nil
 }
 
-// flags holds all parsed command-line flags.
 type flags struct {
 	showVersion bool
 	verbose     bool
@@ -165,7 +163,6 @@ func buildConfig(f *flags) (*grimoire.Config, error) {
 	return cfg, nil
 }
 
-// expandPaths expands ~ in all paths.
 func expandPaths(paths []string) []string {
 	result := make([]string, len(paths))
 	for i, p := range paths {

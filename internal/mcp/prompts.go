@@ -23,7 +23,6 @@ func (s *Server) registerPrompts() {
 	slog.Debug("prompts registered", slog.Int("count", len(skills)))
 }
 
-// convertArguments converts grimoire arguments to MCP prompt arguments.
 func convertArguments(args []grimoire.Argument) []*mcp.PromptArgument {
 	if len(args) == 0 {
 		return nil
@@ -47,7 +46,6 @@ func (s *Server) makePromptHandler(entry *grimoire.Entry) mcp.PromptHandler {
 			slog.String("name", entry.Name),
 			slog.Any("arguments", req.Params.Arguments))
 
-		// Render body with provided arguments
 		body := entry.RenderBody(req.Params.Arguments)
 
 		return &mcp.GetPromptResult{

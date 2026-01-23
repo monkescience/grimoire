@@ -34,8 +34,6 @@ func (s *Server) registerResources() {
 	)
 }
 
-// Resource handlers.
-
 func (s *Server) handleRuleResource(
 	ctx context.Context,
 	req *mcp.ReadResourceRequest,
@@ -64,7 +62,6 @@ func (s *Server) handleSkillResource(
 	return s.getResourceContents(ctx, grimoire.TypeSkill, name, req.Params.URI)
 }
 
-// extractResourceName extracts and decodes the resource name from a URI.
 func extractResourceName(uri, prefix string) (string, error) {
 	raw := strings.TrimPrefix(uri, prefix)
 

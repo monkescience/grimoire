@@ -29,12 +29,10 @@ func (s *Server) handleGuidance(
 	_ *mcp.CallToolRequest,
 	input guidanceInput,
 ) (*mcp.CallToolResult, any, error) {
-	// Handle single name lookup
 	if input.Name != "" {
 		return s.handleGuidanceByName(ctx, []string{input.Name})
 	}
 
-	// Handle batch name lookup
 	if len(input.Names) > 0 {
 		return s.handleGuidanceByName(ctx, input.Names)
 	}
@@ -88,7 +86,6 @@ func (s *Server) handleGuidanceByName(ctx context.Context, names []string) (*mcp
 	}, nil, nil
 }
 
-// formatEntries formats multiple entries for display.
 func formatEntries(entries []*grimoire.Entry) string {
 	var b strings.Builder
 

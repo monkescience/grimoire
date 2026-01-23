@@ -11,25 +11,14 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Config holds the configuration for loading grimoire content.
 type Config struct {
-	// Sources configures where to load content from.
-	Sources SourcesConfig `yaml:"sources"`
-
-	// Rules configures filtering for rules.
-	Rules FilterConfig `yaml:"rules"`
-
-	// Skills configures filtering for skills.
-	Skills FilterConfig `yaml:"skills"`
-
-	// Instructions configures filtering for instructions.
-	Instructions FilterConfig `yaml:"instructions"`
-
-	// Agents configures filtering for agents.
-	Agents FilterConfig `yaml:"agents"`
+	Sources      SourcesConfig `yaml:"sources"`
+	Rules        FilterConfig  `yaml:"rules"`
+	Skills       FilterConfig  `yaml:"skills"`
+	Instructions FilterConfig  `yaml:"instructions"`
+	Agents       FilterConfig  `yaml:"agents"`
 }
 
-// SourcesConfig configures content sources.
 type SourcesConfig struct {
 	// Builtin enables loading embedded content. Default: true.
 	Builtin *bool `yaml:"builtin"`
@@ -39,7 +28,6 @@ type SourcesConfig struct {
 	Paths []string `yaml:"paths"`
 }
 
-// FilterConfig configures allow/block filtering for a content type.
 type FilterConfig struct {
 	// Allow lists names to allow. If non-empty, only these are loaded.
 	Allow []string `yaml:"allow"`
@@ -48,7 +36,6 @@ type FilterConfig struct {
 	Block []string `yaml:"block"`
 }
 
-// BuiltinEnabled returns whether builtin content should be loaded.
 func (c *Config) BuiltinEnabled() bool {
 	if c.Sources.Builtin == nil {
 		return true
@@ -57,12 +44,10 @@ func (c *Config) BuiltinEnabled() bool {
 	return *c.Sources.Builtin
 }
 
-// DefaultConfig returns the default configuration (builtin only).
 func DefaultConfig() *Config {
 	return &Config{}
 }
 
-// LoadConfig loads configuration from a YAML file.
 func LoadConfig(path string) (*Config, error) {
 	path = ExpandHome(path)
 
@@ -92,7 +77,6 @@ func LoadConfig(path string) (*Config, error) {
 	return &cfg, nil
 }
 
-// Validate checks the configuration for errors.
 func (c *Config) Validate() error {
 	err := c.Rules.Validate("rules")
 	if err != nil {
@@ -117,7 +101,6 @@ func (c *Config) Validate() error {
 	return nil
 }
 
-// Validate checks the filter configuration for errors.
 func (f *FilterConfig) Validate(name string) error {
 	if len(f.Allow) > 0 && len(f.Block) > 0 {
 		return fmt.Errorf("%s: %w", name, ErrFilterConflict)
@@ -143,7 +126,6 @@ func ExpandHome(path string) string {
 	return filepath.Join(home, path[1:])
 }
 
-// IsAllowed checks if a name is allowed by the filter config.
 func (f *FilterConfig) IsAllowed(name string) bool {
 	// If allow list is set, only those names are allowed
 	if len(f.Allow) > 0 {
@@ -154,7 +136,6 @@ func (f *FilterConfig) IsAllowed(name string) bool {
 	return !slices.Contains(f.Block, name)
 }
 
-// FilterForType returns the filter config for a given content type.
 func (c *Config) FilterForType(typ Type) *FilterConfig {
 	switch typ {
 	case TypeRule:
