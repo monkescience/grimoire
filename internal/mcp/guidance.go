@@ -20,7 +20,7 @@ type guidanceInput struct {
 func (s *Server) registerGuidance() {
 	mcp.AddTool(s.mcp, &mcp.Tool{
 		Name:        "guidance",
-		Description: grimoire.BuildGuidanceDescription(),
+		Description: grimoire.BuildGuidanceDescription(s.store),
 	}, s.handleGuidance)
 }
 

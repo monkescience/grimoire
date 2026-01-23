@@ -8,13 +8,35 @@ import (
 )
 
 // BuildGuidanceDescription generates the guidance tool description.
-// Skills and rules are listed in server instructions; this just provides usage info.
-func BuildGuidanceDescription() string {
-	return `Load guidance by name.
+// Includes available skills and rules so the tool is self-documenting.
+func BuildGuidanceDescription(s *Store) string {
+	var b strings.Builder
 
-USAGE:
-- guidance(name: "rule-name") - Load one
-- guidance(names: ["a", "b"]) - Load multiple`
+	b.WriteString("Load guidance by name.\n\n")
+	b.WriteString("USAGE:\n")
+	b.WriteString("- guidance(name: \"rule-name\") - Load one\n")
+	b.WriteString("- guidance(names: [\"a\", \"b\"]) - Load multiple")
+
+	skills := s.List(TypeSkill)
+	if len(skills) > 0 {
+		b.WriteString("\n\nSKILLS - Load with guidance(name) BEFORE these tasks:\n")
+
+		for _, e := range skills {
+			summary := summarizeDescription(e.Description)
+			fmt.Fprintf(&b, "- %s: %s\n", e.Name, summary)
+		}
+	}
+
+	rules := s.List(TypeRule)
+	if len(rules) > 0 {
+		b.WriteString("\nRULES - Apply based on description, load with guidance() if you need examples:\n")
+
+		for _, e := range rules {
+			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, e.FormatGlobs(), e.Description)
+		}
+	}
+
+	return b.String()
 }
 
 func BuildAgentDescription(s *Store) string {
@@ -59,35 +81,12 @@ func summarizeDescription(desc string) string {
 }
 
 // BuildServerInstructions generates the server instructions.
-// Includes skills, rules, and instruction entries for the AI to see upfront.
+// Skills and rules are listed in the guidance tool description.
+// This only includes instruction entries for behavioral guidance.
 func BuildServerInstructions(s *Store) string {
 	var b strings.Builder
 
-	b.WriteString("Grimoire provides project-specific coding guidance.\n\n")
-
-	skills := s.List(TypeSkill)
-	if len(skills) > 0 {
-		b.WriteString("SKILLS - Load with guidance(name) BEFORE these tasks:\n")
-
-		for _, e := range skills {
-			// Use first line of description as summary, or truncate if needed
-			summary := summarizeDescription(e.Description)
-			fmt.Fprintf(&b, "- %s: %s\n", e.Name, summary)
-		}
-
-		b.WriteString("\n")
-	}
-
-	rules := s.List(TypeRule)
-	if len(rules) > 0 {
-		b.WriteString("RULES - Apply based on description, load with guidance() if you need examples:\n")
-
-		for _, e := range rules {
-			fmt.Fprintf(&b, "- %s%s: %s\n", e.Name, e.FormatGlobs(), e.Description)
-		}
-
-		b.WriteString("\n")
-	}
+	b.WriteString("Grimoire provides project-specific coding guidance.\n")
 
 	instructions := s.List(TypeInstruction)
 	if len(instructions) > 0 {
@@ -99,7 +98,7 @@ func BuildServerInstructions(s *Store) string {
 			return cmp.Compare(a.Name, b.Name)
 		})
 
-		b.WriteString("---\n\n")
+		b.WriteString("\n---\n\n")
 
 		for i, instr := range instructions {
 			if i > 0 {
